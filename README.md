@@ -1,12 +1,13 @@
-# Project Name
+# Lunascript
 
-Brief description of your project.
+A compiler made for the fun of it
+It's inspired by lua but made to my own liking
+Extension is `.luna`
 
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [Building](#building)
-- [Running](#running)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -14,9 +15,8 @@ Brief description of your project.
 
 Make sure you have the following installed:
 
-- C++ compiler (e.g., GCC, Clang)
-- CMake (version x.x.x or later)
-- Any other dependencies...
+- C++ compiler e.g., GCC, Clang (we like gcc)
+- CMake (version 3.27.0 or later)
 
 ## Building
 ```bash
