@@ -18,11 +18,17 @@ namespace luna{
     using i32 = std::int32_t;
     using i64 = std::int64_t;
     using usz = std::size_t;
-    struct Loc{
-        std::string file;
-        usz row = 0, col = 0;
+    class Loc{
+        private:
+            std::string _file;
+            usz _row = 1, _col = 1;
+        public:
+            Loc() :_file("None"){}
+            Loc(std::string file) :_file(file){}
+            void next_row(){ _row++; _col = 1; }
+            std::string to_str();
+            void update(int c);
     };
-    Loc makeloc(std::string file);
 };
 
 #endif // LUNA_CORE_HH

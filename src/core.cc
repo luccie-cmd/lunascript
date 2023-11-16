@@ -1,12 +1,17 @@
 // For any core defined functions (Loc)
 #include "core.hh"
 
-luna::Loc luna::makeloc(std::string file){
-    luna::Loc ret;
-    // Most (all) editors start counting from: File:1:1 so we do the same
-    // but don't count the collumn from 1 but from 0 (doesn't know why it works it just does)
-    ret.col = 0;
-    ret.row = 1;
-    ret.file = file;
-    return ret;
+std::string luna::Loc::to_str(){
+    return std::string(fmt::format("{}:{}:{}", _file, _row, _col));
+}
+
+void luna::Loc::update(int c){
+    if(c == '\n'){
+        _col = 0;
+        _row++;
+    } else if(c == '\t'){
+        _col+=4;
+    } else{
+        _col++;
+    }
 }

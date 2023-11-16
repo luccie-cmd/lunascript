@@ -7,14 +7,7 @@ void Lexer::advance(){
     if(idx < _contents.size()){
         idx+=1;
         _c = _contents.at(idx);
-        if(_c == '\n'){
-            loc.col = 0;
-            loc.row++;
-        } else if(_c == '\t'){
-            loc.col+=4;
-        } else{
-            loc.col++;
-        }
+        loc.update(_c);
     }
 }
 
@@ -33,6 +26,7 @@ Token Lexer::next_token(){
     while(_c == COMMENT_SYMBOL && idx < _contents.size()-1){
         while(_c != '\n' && idx < _contents.size()-1) advance();
         skip_whitespace();
+        // loc.next_row();
     }
     // Another check for EOF
     skip_whitespace();
@@ -74,7 +68,7 @@ Token Lexer::next_token(){
     }
 
     // if all fails exit and print the location
-    fmt::print("{}:{}:{}: ERROR: Invalid token {}\n", loc.file, loc.row, loc.col, _c);
+    fmt::print("{}: ERROR: Invalid token {}\n", loc.to_str(), _c);
     exit(1);
 }
 

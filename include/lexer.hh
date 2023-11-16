@@ -12,7 +12,7 @@ namespace luna{
                     exit(1);
                 }
                 _c = contents.at(0);
-                loc = makeloc(file);
+                loc = luna::Loc(file);
             }
             std::vector<Token> lex();
             Token next_token();
