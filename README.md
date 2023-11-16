@@ -20,8 +20,8 @@ Make sure you have the following installed:
 
 ## Building
 ```bash
-    > git clone https://github.com/your-username/your-project.git
-    > cd your-project
+    > git clone https://github.com/luccie-cmd/lunascript.git
+    > cd lunascript
     > chmod +x ./build.sh
     > ./build.sh
 ```
