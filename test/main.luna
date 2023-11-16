@@ -1,0 +1,20 @@
+# Function calls with classes and such
+# Format (fmt) is implemented by default
+
+fmt.print("Hello, World!\n");
+# exit(0);
+
+# Function decleration with and without type hinting
+func main(): i8 {
+    # Nothing
+    # Test empty bodies
+}
+
+func main2() {
+    main();
+}
+
+# Other stuff (variables, binops, ...)
+var x = 69420;
+# No support for binary operations yet
+# 1 + 2;
