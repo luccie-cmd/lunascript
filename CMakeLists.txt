@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(LunaScript VERSION 2.0.0 LANGUAGES C CXX)
+project(LUNA VERSION 2.0.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -133,11 +133,11 @@ endif()
 ## Debug/Release flags.
 if (NOT MSVC)
     target_compile_options(options INTERFACE
-        $<$<CONFIG:DEBUG>:-O0 -g3 -ggdb -rdynamic>
+        $<$<CONFIG:DEBUG>:-O0 -g3 -ggdb3 -rdynamic>
         $<$<CONFIG:RELEASE>:-O3 -march=native>
     )
     target_link_options(options INTERFACE
-        $<$<CONFIG:DEBUG>:-O0 -g3 -ggdb -rdynamic>
+        $<$<CONFIG:DEBUG>:-O0 -g3 -ggdb3 -rdynamic>
         $<$<CONFIG:RELEASE>:-O3 -march=native>
     )
 else()

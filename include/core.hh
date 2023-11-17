@@ -18,6 +18,17 @@ namespace luna{
     using i32 = std::int32_t;
     using i64 = std::int64_t;
     using usz = std::size_t;
+    template<typename T>
+    void reverse_vector_in_place(std::vector<T>& list) {
+        std::reverse(list.begin(), list.end());
+    }
+    
+    template<typename T>
+    T vector_pop_back(std::vector<T>& list){
+        T ret = list.back();
+        list.pop_back();
+        return ret;
+    }
     class Loc{
         private:
             std::string _file;
