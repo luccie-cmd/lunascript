@@ -14,6 +14,7 @@ namespace luna{
         CLOSE_CURLY,
         SEMICOLON,
         COLON,
+        COMMA,
         EQUAL,
         TT_EOF,
     };
@@ -23,7 +24,7 @@ namespace luna{
             /// @brief This is the delceration for a token
             /// @param type Specifies the tokentype to be used in parsing
             /// @param value Specific value of the token
-            Token(TokenType type, std::string value) :_type(type), _value(value){}
+            Token(TokenType type, std::string value, Loc _loc) :_type(type), _value(value), loc(_loc){}
             // Stores the tokentype declared above this decleration
             TokenType _type;
             // Why not use std::variant or std::optional you may ask
