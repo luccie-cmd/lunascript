@@ -2,9 +2,9 @@
 
 ### Not finished
 
-A compiler made for the fun of it
-It's inspired by lua but made to my own liking
-Extension is `.luna`
+A compiler made for the fun of it.
+It's inspired by lua but made to my own liking.
+Extension is `.luna`.
 
 ## Table of Contents
 
