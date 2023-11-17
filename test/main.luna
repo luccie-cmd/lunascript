@@ -1,6 +1,5 @@
-# Function calls with classes and such
-# Format (fmt) is implemented by default
-
+# Function calls
+# A lot of format functions are implemented with fmt_[TYPE] 
 fmt_print("Hello, World!\n");
 # std.exit(0);
 
