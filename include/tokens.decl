@@ -2,14 +2,14 @@
 #define TOKENS_DECL
 
 std::vector<Token> hardcoded_tokens = {
-    Token(TokenType::DOT, "."),
-    Token(TokenType::OPEN_PAREN, "("),
-    Token(TokenType::CLOSE_PAREN, ")"),
-    Token(TokenType::OPEN_CURLY, "{"),
-    Token(TokenType::CLOSE_CURLY, "}"),
-    Token(TokenType::SEMICOLON, ";"),
-    Token(TokenType::COLON, "="),
-    Token(TokenType::EQUAL, ":"),
+    Token(TokenType::DOT, ".", loc),
+    Token(TokenType::OPEN_PAREN, "(", loc),
+    Token(TokenType::CLOSE_PAREN, ")", loc),
+    Token(TokenType::OPEN_CURLY, "{", loc),
+    Token(TokenType::CLOSE_CURLY, "}", loc),
+    Token(TokenType::SEMICOLON, ";", loc),
+    Token(TokenType::COLON, "=", loc),
+    Token(TokenType::EQUAL, ":", loc),
 };
 
 #endif // TOKENS_DECL

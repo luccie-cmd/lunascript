@@ -35,6 +35,8 @@ namespace luna{
             void print(){
                 fmt::print("{}: `{}`\n", static_cast<int>(_type), _value);
             }
+            // Stores the location of the token
+            Loc loc;
     };
 };
 

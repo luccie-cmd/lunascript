@@ -21,7 +21,7 @@ void Lexer::skip_whitespace(){
 Token Lexer::next_token(){
     skip_whitespace();
     // first off check for EOF
-    if(idx >= _contents.size()-1) return Token(TokenType::TT_EOF, "\0");
+    if(idx >= _contents.size()-1) return Token(TokenType::TT_EOF, "\0", loc);
     // Next check for any recurring or single comments
     while(_c == COMMENT_SYMBOL && idx < _contents.size()-1){
         while(_c != '\n' && idx < _contents.size()-1) advance();
@@ -30,7 +30,7 @@ Token Lexer::next_token(){
     }
     // Another check for EOF
     skip_whitespace();
-    if(idx >= _contents.size()-1) return Token(TokenType::TT_EOF, "\0");
+    if(idx >= _contents.size()-1) return Token(TokenType::TT_EOF, "\0", loc);
 
 // include the hardcoded tokens
 #include "tokens.decl"
@@ -51,7 +51,7 @@ Token Lexer::next_token(){
             buffer.push_back(_c);
             advance();
         }
-        return Token(TokenType::ID, buffer);
+        return Token(TokenType::ID, buffer, loc);
     }
 
     // check for strings
@@ -64,7 +64,7 @@ Token Lexer::next_token(){
         }
         // skip the next " token
         advance();
-        return Token(TokenType::STRING, buffer);
+        return Token(TokenType::STRING, buffer, loc);
     }
 
     // if all fails exit and print the location
