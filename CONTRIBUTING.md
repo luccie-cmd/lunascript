@@ -1,10 +1,11 @@
 # Contributing
 
 - I only look into small PRs that suggest
+  - New frontends,
   - bug fixes,
   - documentation fixes.
 - I do not look into PRs that
-  - implement new features,
+  - implement new features on the compiling/backend,
   - refactor/cleanup the code.
 - What qualifies as a bug, a feature, or refactoring is entirely upon my interpretation.
 
