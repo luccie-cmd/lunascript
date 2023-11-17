@@ -1,8 +1,8 @@
 # Function calls with classes and such
 # Format (fmt) is implemented by default
 
-fmt.print("Hello, World!\n");
-# exit(0);
+fmt_print("Hello, World!\n");
+# std.exit(0);
 
 # Function decleration with and without type hinting
 func main(): i8 {
@@ -18,3 +18,27 @@ func main2() {
 var x = 69420;
 # No support for binary operations yet
 # 1 + 2;
+
+# AST
+# |- EXPR(call)
+#    |- CLASS: fmt
+#    |- NAME: print
+#    |- OPERANDS
+#         |- STRING: Hello, World!\n
+# |- FUNC DECL
+#    |- NAME: main
+#    |- TYPE_HINT: i8
+#    |- BODY
+# |- FUNC DECL
+#    |- NAME: main
+#    |- TYPE_HINT: i64
+#    |- BODY
+#        |- EXPR(call)
+#            |- CLASS: main
+#            |- NAME: main
+#            |- OPERANDS
+# |- VAR_DECL
+#     |- NAME: x
+# |- VAR_ASSIGN
+#     |- NAME: x
+#     |- VALUE: 69420
