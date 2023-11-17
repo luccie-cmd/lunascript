@@ -1,6 +1,11 @@
 # Contributing
 
-### RULES
-No new features (frontends will be discussed).
-Bugfixes are fine.
-Updates to the build process are also fine.
+- I only look into small PRs that suggest
+  - bug fixes,
+  - documentation fixes.
+- I do not look into PRs that
+  - implement new features,
+  - refactor/cleanup the code.
+- What qualifies as a bug, a feature, or refactoring is entirely upon my interpretation.
+
+Sorry for any inconveniences. If you want to stir the project in a particular direction in terms of features feel free to fork it, I don't mind. Just make sure you have fun while developing it! This is like the whole point!
