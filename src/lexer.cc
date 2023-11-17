@@ -43,13 +43,16 @@ Token Lexer::next_token(){
     }
 
     // Check for any ids / numbers
-    if(isalnum(_c)){
+    if(isalnum(_c) || _c == '_'){
         std::string buffer;
         buffer.push_back(_c);
         advance();
-        while(isalnum(_c)){
+        while(isalnum(_c) || _c == '_'){
             buffer.push_back(_c);
             advance();
+        }
+        if(isdigit(buffer.at(0))){
+            return Token(TokenType::NUMBER, buffer, loc);
         }
         return Token(TokenType::ID, buffer, loc);
     }
