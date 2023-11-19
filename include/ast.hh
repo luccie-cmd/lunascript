@@ -10,6 +10,7 @@ namespace luna{
         NONE,
         ROOT,
         EXPR,
+        FUNC_DECL,
     };
 
     enum struct ExprType {
@@ -18,8 +19,9 @@ namespace luna{
     };
 
     class Expr;
+    class FuncDecl;
     // Alias for the variant type
-    using AstTypes = std::variant<Expr*>;
+    using AstTypes = std::variant<Expr*, FuncDecl*>;
 
     class Ast {
     public:
@@ -46,6 +48,24 @@ namespace luna{
         std::string _name;
         std::vector<Token> operands;
     };
+
+    enum struct TypeHint{
+        I8,
+        I16,
+        I32,
+        I64,
+    };
+    class FuncDecl : public Ast {
+    public:
+        FuncDecl(std::string name, TypeHint hint) :_name(name), _hint(hint){}
+        void set_body(Ast bod){ body = bod; }
+        Ast get_body(){ return body; }
+    private:
+        std::string _name;
+        TypeHint _hint;
+        Ast body;
+    };
+
 };
 
 #endif // LUNA_AST_HH
