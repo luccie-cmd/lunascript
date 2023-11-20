@@ -6,29 +6,32 @@
 
 namespace luna{
 
-    enum struct AstType {
+    enum struct AstType : int {
         NONE,
         ROOT,
         EXPR,
         FUNC_DECL,
     };
 
-    enum struct ExprType {
+    enum struct ExprType : int {
         NONE,
         CALL,
     };
 
     class Expr;
     class FuncDecl;
+    class VarAssign;
+    class VarDecl;
     // Alias for the variant type
-    using AstTypes = std::variant<Expr*, FuncDecl*>;
+    using AstTypes = std::variant<Expr*, FuncDecl*, VarAssign*, VarDecl*>;
 
     class Ast {
     public:
         Ast(AstType type = AstType::NONE) : _type(type) {}
         void add_child(AstTypes child) { _children.push_back(child); }
         std::vector<AstTypes> get_children() { return _children; }
-
+        void print();
+        AstType get_type() { return _type; }
     private:
         AstType _type;
         std::vector<AstTypes> _children;
@@ -37,6 +40,7 @@ namespace luna{
     class Expr : public Ast {
     public:
         Expr(ExprType type = ExprType::NONE) : _type(type) {}
+        ExprType expr_get_type() { return _type; }
         // Call Expr
         void call_add_operand(const Token& tok) { operands.push_back(tok); }
         void call_set_name(std::string& name) { _name = name; }
@@ -66,6 +70,19 @@ namespace luna{
         Ast body;
     };
 
+    class VarAssign : public Ast{
+    public:
+        VarAssign(std::string& name, std::variant<std::string, int> value) :_name(name), _value(value){}
+    private:
+        std::string _name;
+        std::variant<std::string, int> _value;
+    };
+    class VarDecl : public Ast{
+    public:
+        VarDecl(std::string& name) :_name(name){}
+    private:
+        std::string _name;
+    };
 };
 
 #endif // LUNA_AST_HH

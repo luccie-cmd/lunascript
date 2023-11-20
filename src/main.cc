@@ -11,12 +11,15 @@ using options = clopts<
     help<>
 >;
 
+using namespace luna;
+
 int main(int argc, char** argv){
     auto opts = options::parse(argc, argv);
     auto file_name = opts.get<"file">()->path;
     auto file_contents = opts.get<"file">()->contents;
-    luna::Lexer lexer(std::string(file_name), file_contents);
-    luna::Parser parser(lexer);
-    luna::Ast ast = parser.nodes();
+    Lexer lexer(std::string(file_name), file_contents);
+    Parser parser(lexer);
+    Ast ast = parser.nodes();
+    ast.print();
     return 0;
 }
