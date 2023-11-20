@@ -11,6 +11,8 @@ namespace luna{
         ROOT,
         EXPR,
         FUNC_DECL,
+        VAR_ASSIGN,
+        VAR_DECL,
     };
 
     enum struct ExprType : int {
@@ -39,7 +41,7 @@ namespace luna{
 
     class Expr : public Ast {
     public:
-        Expr(ExprType type = ExprType::NONE) : _type(type) {}
+        Expr(ExprType type = ExprType::NONE) :Ast(AstType::EXPR), _type(type) {}
         ExprType expr_get_type() { return _type; }
         // Call Expr
         void call_add_operand(const Token& tok) { operands.push_back(tok); }
@@ -61,7 +63,7 @@ namespace luna{
     };
     class FuncDecl : public Ast {
     public:
-        FuncDecl(std::string name, TypeHint hint) :_name(name), _hint(hint){}
+        FuncDecl(std::string name, TypeHint hint) :Ast(AstType::FUNC_DECL), _name(name), _hint(hint){}
         void set_body(Ast bod){ body = bod; }
         Ast get_body(){ return body; }
     private:
@@ -72,14 +74,14 @@ namespace luna{
 
     class VarAssign : public Ast{
     public:
-        VarAssign(std::string& name, std::variant<std::string, int> value) :_name(name), _value(value){}
+        VarAssign(std::string& name, std::variant<std::string, int> value) :Ast(AstType::VAR_ASSIGN), _name(name), _value(value){}
     private:
         std::string _name;
         std::variant<std::string, int> _value;
     };
     class VarDecl : public Ast{
     public:
-        VarDecl(std::string& name) :_name(name){}
+        VarDecl(std::string& name) :Ast(AstType::VAR_DECL), _name(name){}
     private:
         std::string _name;
     };
