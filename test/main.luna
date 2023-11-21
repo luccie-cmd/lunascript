@@ -1,7 +1,7 @@
 # Function calls
 # A lot of format functions are implemented with fmt_[TYPE] 
 fmt_print("Hello, World!\n");
-# std.exit(0);
+# std_exit(0);
 
 # Function decleration with and without type hinting
 func main(): i8 {

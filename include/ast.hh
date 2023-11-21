@@ -1,10 +1,11 @@
 #if !defined(LUNA_AST_HH)
 #define LUNA_AST_HH
-#include <variant>
+
 #include "core.hh"
 #include "token.hh"
+#include <variant>
 
-namespace luna{
+namespace luna {
 
     enum struct AstType : int {
         NONE,
@@ -20,20 +21,22 @@ namespace luna{
         CALL,
     };
 
+    class Ast;
     class Expr;
     class FuncDecl;
     class VarAssign;
     class VarDecl;
-    // Alias for the variant type
-    using AstTypes = std::variant<Expr*, FuncDecl*, VarAssign*, VarDecl*>;
+
+    // Forward declaration of AstTypes
+    using AstTypes = std::variant<Expr, FuncDecl, VarDecl, VarAssign>;
 
     class Ast {
     public:
         Ast(AstType type = AstType::NONE) : _type(type) {}
-        void add_child(AstTypes child) { _children.push_back(child); }
-        std::vector<AstTypes> get_children() { return _children; }
+        void add_child(const AstTypes& child) { _children.push_back(child); }
+        std::vector<AstTypes> get_children() const { return _children; }
         void print();
-        AstType get_type() { return _type; }
+        AstType get_type() const { return _type; }
     private:
         AstType _type;
         std::vector<AstTypes> _children;
@@ -41,13 +44,13 @@ namespace luna{
 
     class Expr : public Ast {
     public:
-        Expr(ExprType type = ExprType::NONE) :Ast(AstType::EXPR), _type(type) {}
-        ExprType expr_get_type() { return _type; }
+        Expr(ExprType type = ExprType::NONE) : Ast(AstType::EXPR), _type(type) {}
+        ExprType expr_get_type() const { return _type; }
         // Call Expr
         void call_add_operand(const Token& tok) { operands.push_back(tok); }
-        void call_set_name(std::string& name) { _name = name; }
-        std::vector<Token> call_get_operands() { return operands; }
-        std::string call_get_name() { return _name; };
+        void call_set_name(const std::string& name) { _name = name; }
+        std::vector<Token> call_get_operands() const { return operands; }
+        std::string call_get_name() const { return _name; }
     private:
         ExprType _type;
         // Call Expr
@@ -55,36 +58,39 @@ namespace luna{
         std::vector<Token> operands;
     };
 
-    enum struct TypeHint{
+    enum struct TypeHint {
         I8,
         I16,
         I32,
         I64,
     };
+
     class FuncDecl : public Ast {
     public:
-        FuncDecl(std::string name, TypeHint hint) :Ast(AstType::FUNC_DECL), _name(name), _hint(hint){}
-        void set_body(Ast bod){ body = bod; }
-        Ast get_body(){ return body; }
+        FuncDecl(std::string name, TypeHint hint) : Ast(AstType::FUNC_DECL), _name(name), _hint(hint) {}
+        void set_body(const Ast& bod) { body = bod; }
+        const Ast& get_body() const { return body; }
     private:
         std::string _name;
         TypeHint _hint;
         Ast body;
     };
 
-    class VarAssign : public Ast{
+    class VarAssign : public Ast {
     public:
-        VarAssign(std::string& name, std::variant<std::string, int> value) :Ast(AstType::VAR_ASSIGN), _name(name), _value(value){}
+        VarAssign(std::string name, std::variant<std::string, int> value) : Ast(AstType::VAR_ASSIGN), _name(name), _value(value) {}
     private:
         std::string _name;
         std::variant<std::string, int> _value;
     };
-    class VarDecl : public Ast{
+
+    class VarDecl : public Ast {
     public:
-        VarDecl(std::string& name) :Ast(AstType::VAR_DECL), _name(name){}
+        VarDecl(std::string name) : Ast(AstType::VAR_DECL), _name(name) {}
     private:
         std::string _name;
     };
-};
+
+}
 
 #endif // LUNA_AST_HH

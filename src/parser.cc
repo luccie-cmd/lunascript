@@ -2,7 +2,6 @@
 
 luna::Ast luna::Parser::nodes(){
     luna::Ast ret(AstType::ROOT);
-    // luna::Token current = vector_pop_back<Token>(_tokens);
     luna::Token next = vector_pop_back<Token>(_tokens);
     while(1){
         Token pref = next;
@@ -52,10 +51,10 @@ luna::Ast luna::Parser::nodes(){
 
             // fmt::print("Pasing body\n");
             Ast body = nodes();
-            
+
             FuncDecl node(name, type_hint);
             node.set_body(body);
-            ret.add_child(&node);
+            ret.add_child(node);
 
         } else if(next._type == TokenType::ID){
             Token pref2 = next;
@@ -95,7 +94,7 @@ luna::Ast luna::Parser::nodes(){
                 Expr expr(ExprType::CALL);
                 for(Token t : operands) expr.call_add_operand(t);
                 expr.call_set_name(name);
-                ret.add_child(&expr);
+                ret.add_child(expr);
                 // Variable decleration
             } else if(pref2._value == "var") {
                 pref = next;
@@ -122,14 +121,14 @@ luna::Ast luna::Parser::nodes(){
                     std::string& name = lhs;
                     std::string& value = pref._value;
                     VarDecl decl(name);
-                    ret.add_child(&decl);
+                    ret.add_child(decl);
                     VarAssign assign(name, value);
-                    ret.add_child(&assign);                    
+                    ret.add_child(assign);                    
                 } else if(next._type == TokenType::SEMICOLON){
                     std::string& name = pref._value;
                     // No error reporting here since we do that above and below
                     VarDecl decl(name);
-                    ret.add_child(&decl);
+                    ret.add_child(decl);
                 } else{
                     fmt::print("{}: ERROR: Expected `=` or `;` but got `{}`\n", next.loc.to_str(), next._value);
                     std::exit(1);
