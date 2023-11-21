@@ -35,7 +35,7 @@ namespace luna {
         Ast(AstType type = AstType::NONE) : _type(type) {}
         void add_child(const AstTypes& child) { _children.push_back(child); }
         std::vector<AstTypes> get_children() const { return _children; }
-        void print();
+        void print(std::string prefix="", std::string AstName="AST");
         AstType get_type() const { return _type; }
     private:
         AstType _type;
@@ -45,7 +45,7 @@ namespace luna {
     class Expr : public Ast {
     public:
         Expr(ExprType type = ExprType::NONE) : Ast(AstType::EXPR), _type(type) {}
-        ExprType expr_get_type() const { return _type; }
+        ExprType get_type() const { return _type; }
         // Call Expr
         void call_add_operand(const Token& tok) { operands.push_back(tok); }
         void call_set_name(const std::string& name) { _name = name; }
@@ -70,6 +70,7 @@ namespace luna {
         FuncDecl(std::string name, TypeHint hint) : Ast(AstType::FUNC_DECL), _name(name), _hint(hint) {}
         void set_body(const Ast& bod) { body = bod; }
         const Ast& get_body() const { return body; }
+        const std::string& get_name() const { return _name; }
     private:
         std::string _name;
         TypeHint _hint;

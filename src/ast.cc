@@ -1,29 +1,36 @@
 #include "ast.hh"
 
-void luna::Ast::print() {
+void luna::Ast::print(std::string prefix, std::string AstName) {
     if (this->get_type() == AstType::ROOT) {
-        fmt::print("AST\n");
+        fmt::print("{}{}\n", prefix, AstName);
     }
 
     for (AstTypes child : this->get_children()) {
         try {
             if (auto expr = std::get_if<Expr>(&child)) {
-                fmt::print("EXPR\n");
-                switch(expr->expr_get_type()){
+                fmt::print("{}|- EXPR\n", prefix);
+                switch(expr->get_type()){
                     case ExprType::NONE: {
                         fmt::print("Bug in parsing step!\n");
                         std::exit(1);
                     } break;
                     case ExprType::CALL: {
-                        fmt::print("|- NAME: {}\n", expr->call_get_name());
+                        fmt::print("{}|    |- NAME: {}\n", prefix, expr->call_get_name());
+                            fmt::print("{}|    |- OPERANDS\n", prefix);
+                        for(Token t : expr->call_get_operands()){
+                            fmt::print("{}|        |- `{}`\n", prefix, t._value);
+                        }
                     } break;
                     default: {
-                        fmt::print("Unhanled ExprType! `{}`\n", static_cast<u64>(expr->expr_get_type()));
+                        fmt::print("Unhanled ExprType! `{}`\n", static_cast<u64>(expr->get_type()));
                         std::exit(1);
                     } break;
                 }
             } else if (auto funcDecl = std::get_if<FuncDecl>(&child)) {
-                // (*funcDecl)->print(); // Assuming you have a print method in FuncDecl
+                fmt::print("{}|- FUNC DECL\n", prefix);
+                fmt::print("{}|    |- NAME: `{}`\n", prefix, funcDecl->get_name());
+                Ast body = funcDecl->get_body();
+                body.print("    ", "BODY");
             } else if (auto varAssign = std::get_if<VarAssign>(&child)) {
                 // Handle VarAssign
             } else if (auto varDecl = std::get_if<VarDecl>(&child)) {
