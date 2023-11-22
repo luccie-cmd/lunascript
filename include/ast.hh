@@ -80,6 +80,9 @@ namespace luna {
     class VarAssign : public Ast {
     public:
         VarAssign(std::string name, std::variant<std::string, int> value) : Ast(AstType::VAR_ASSIGN), _name(name), _value(value) {}
+        const std::string& get_name() const { return _name; }
+        template<typename T>
+        const T& get_value() const { return std::get<T>(_value); }
     private:
         std::string _name;
         std::variant<std::string, int> _value;
@@ -88,6 +91,7 @@ namespace luna {
     class VarDecl : public Ast {
     public:
         VarDecl(std::string name) : Ast(AstType::VAR_DECL), _name(name) {}
+        const std::string& get_name() const { return _name; }
     private:
         std::string _name;
     };

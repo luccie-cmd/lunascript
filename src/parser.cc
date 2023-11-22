@@ -1,4 +1,5 @@
 #include "parser.hh"
+#include <unordered_map>
 
 luna::Ast luna::Parser::nodes(){
     luna::Ast ret(AstType::ROOT);
@@ -118,8 +119,8 @@ luna::Ast luna::Parser::nodes(){
                         fmt::print("{}: ERROR: Expected semicolon at the end of an variable assignment!\n", pref.loc.to_str());
                         std::exit(1);
                     }
-                    std::string& name = lhs;
-                    std::string& value = pref._value;
+                    std::string name = lhs;
+                    std::string value = pref._value;
                     VarDecl decl(name);
                     ret.add_child(decl);
                     VarAssign assign(name, value);
@@ -134,18 +135,23 @@ luna::Ast luna::Parser::nodes(){
                     std::exit(1);
                 }
             } else if(next._type == TokenType::EQUAL){
-                std::string& name = pref._value;
-                next = vector_pop_back<Token>(_tokens);
+                std::string name = pref._value;
+                pref = next = vector_pop_back<Token>(_tokens);
                 if(next._type != TokenType::STRING && next._type != TokenType::NUMBER){
                     fmt::print("{}: ERROR: Invalid assignment expression!\n", next.loc.to_str());
                     std::exit(1);
                 }
-                std::string& value = next._value;
+                pref.print();
+                next.print();
+                std::string value = next._value;
                 next = vector_pop_back<Token>(_tokens);
                 if(next._type != TokenType::SEMICOLON){
                     fmt::print("{}: ERROR: Expected semicolon at the end of an variable assignment!\n", pref.loc.to_str());
                     std::exit(1);
                 }
+
+                VarAssign assign(name, value);
+                ret.add_child(assign);
             } else{
                 fmt::print("{}: ERROR: Invalid token found `{}`\n", pref.loc.to_str(), pref._value);
                 if(next._type != TokenType::TT_EOF) fmt::print("{}: INFO: Next token `{}`\n", next.loc.to_str(), next._value);

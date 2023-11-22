@@ -32,9 +32,12 @@ void luna::Ast::print(std::string prefix, std::string AstName) {
                 Ast body = funcDecl->get_body();
                 body.print("    ", "BODY");
             } else if (auto varAssign = std::get_if<VarAssign>(&child)) {
-                // Handle VarAssign
+                fmt::print("{}|- VAR ASSIGN\n", prefix);
+                fmt::print("{}|    |- NAME: `{}`\n", prefix, varAssign->get_name());
+                fmt::print("{}|    |- VALUE: `{}`\n", prefix, varAssign->get_value<std::string>());
             } else if (auto varDecl = std::get_if<VarDecl>(&child)) {
-                // Handle VarDecl
+                fmt::print("{}|- VAR DECL\n", prefix);
+                fmt::print("{}|    |- NAME: `{}`\n", prefix, varDecl->get_name());
             } else {
                 fmt::print("Unexpected variant type!\n");
             }
