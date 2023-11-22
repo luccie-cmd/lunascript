@@ -119,6 +119,7 @@ luna::Ast luna::Parser::nodes(){
                         fmt::print("{}: ERROR: Expected semicolon at the end of an variable assignment!\n", pref.loc.to_str());
                         std::exit(1);
                     }
+
                     std::string name = lhs;
                     std::string value = pref._value;
                     VarDecl decl(name);
@@ -141,8 +142,6 @@ luna::Ast luna::Parser::nodes(){
                     fmt::print("{}: ERROR: Invalid assignment expression!\n", next.loc.to_str());
                     std::exit(1);
                 }
-                pref.print();
-                next.print();
                 std::string value = next._value;
                 next = vector_pop_back<Token>(_tokens);
                 if(next._type != TokenType::SEMICOLON){

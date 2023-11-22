@@ -15,6 +15,7 @@ void luna::Ast::print(std::string prefix, std::string AstName) {
                         std::exit(1);
                     } break;
                     case ExprType::CALL: {
+                        fmt::print("{}|    |- TYPE: Call Expr\n", prefix);
                         fmt::print("{}|    |- NAME: {}\n", prefix, expr->call_get_name());
                             fmt::print("{}|    |- OPERANDS\n", prefix);
                         for(Token t : expr->call_get_operands()){
