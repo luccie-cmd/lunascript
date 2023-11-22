@@ -153,14 +153,12 @@ luna::Ast luna::Parser::nodes(){
                 ret.add_child(assign);
             } else{
                 fmt::print("{}: ERROR: Invalid token found `{}`\n", pref.loc.to_str(), pref._value);
-                if(next._type != TokenType::TT_EOF) fmt::print("{}: INFO: Next token `{}`\n", next.loc.to_str(), next._value);
                 std::exit(1);
             }
         } else if(next._type == TokenType::TT_EOF || next._type == TokenType::CLOSE_CURLY){
             break;
         } else{
             fmt::print("{}: ERROR: Invalid token found `{}`\n", pref.loc.to_str(), pref._value);
-            if(next._type != TokenType::TT_EOF) fmt::print("{}: INFO: Next token `{}`\n", next.loc.to_str(), next._value);
             std::exit(1);
         }
         next = vector_pop_back<Token>(_tokens);
