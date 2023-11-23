@@ -68,7 +68,7 @@ namespace luna {
     class FuncDecl : public Ast {
     public:
         FuncDecl(std::string name, TypeHint hint) : Ast(AstType::FUNC_DECL), _name(name), _hint(hint) {}
-        void set_body(const Ast& bod) { body = bod; }
+        void set_body(const Ast bod) { body = bod; }
         const Ast& get_body() const { return body; }
         const std::string& get_name() const { return _name; }
         const std::string get_typehint_str() const { 
