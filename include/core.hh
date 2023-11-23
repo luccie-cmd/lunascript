@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <string>
 
+// TODO: Implement something like a Diag namespace to automatiacly print with colors and exit with an error code
+
 namespace luna{
     using u8 = std::uint8_t;
     using u16 = std::uint16_t;

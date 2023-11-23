@@ -75,6 +75,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clan
         -Werror=missing-field-initializers
         -Werror=non-virtual-dtor
         -Werror=pessimizing-move
+
+        -fsanitize=address
     )
 
     # -march=native only makes sense when compiling for the compiled system.

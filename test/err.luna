@@ -1,0 +1,6 @@
+# This is to test the errors that we get back
+# Should not be called with the `-e` flag in an sh script
+
+func main(){
+    &^ # Make the lexer mad
+}

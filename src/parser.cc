@@ -13,6 +13,7 @@ luna::Ast luna::Parser::nodes(){
             next = vector_pop_back<Token>(_tokens);
             if(next._type != TokenType::OPEN_PAREN){
                 fmt::print("{}: ERROR: Found invalid token after function name decleration! `{}`\n", next.loc.to_str(), next._value);
+                std::exit(1);
             }
             // TODO: Parse function decleration arguments
             next = vector_pop_back<Token>(_tokens);

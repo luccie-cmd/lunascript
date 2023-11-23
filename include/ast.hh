@@ -71,6 +71,15 @@ namespace luna {
         void set_body(const Ast& bod) { body = bod; }
         const Ast& get_body() const { return body; }
         const std::string& get_name() const { return _name; }
+        const std::string get_typehint_str() const { 
+            switch (_hint){
+                case TypeHint::I8: return "I8";
+                case TypeHint::I16: return "I16";
+                case TypeHint::I32: return "I32";
+                case TypeHint::I64: return "I64";
+            }
+            return "INVALID";
+        }
     private:
         std::string _name;
         TypeHint _hint;

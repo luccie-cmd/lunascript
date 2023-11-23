@@ -30,6 +30,7 @@ void luna::Ast::print(std::string prefix, std::string AstName) {
             } else if (auto funcDecl = std::get_if<FuncDecl>(&child)) {
                 fmt::print("{}|- FUNC DECL\n", prefix);
                 fmt::print("{}|    |- NAME: `{}`\n", prefix, funcDecl->get_name());
+                fmt::print("{}|    |- TYPE HINT: `{}`\n", prefix, funcDecl->get_typehint_str());
                 Ast body = funcDecl->get_body();
                 body.print("    ", "BODY");
             } else if (auto varAssign = std::get_if<VarAssign>(&child)) {
