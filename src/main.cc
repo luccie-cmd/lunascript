@@ -7,6 +7,8 @@
 using namespace command_line_options;
 
 using options = clopts<
+    flag<"--print-ast", "Print the AST">,
+    flag<"--no-errors", "Disable all the error exits (does not disable colors)">,
     positional<"file", "The file whose contents should be read and compiled", file<>, /*required=*/true>,
     help<>
 >;
