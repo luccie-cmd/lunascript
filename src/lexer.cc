@@ -83,6 +83,7 @@ std::vector<Token> Lexer::lex(){
         next = next_token();
         ret.push_back(next);
     }
+    ret.push_back(Token(TokenType::TT_EOF, "\0", loc));
     return ret;
 }
 
