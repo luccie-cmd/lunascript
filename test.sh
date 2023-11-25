@@ -12,10 +12,6 @@ for file in $test_dir/*.luna
 do
     if [ -f "$file" ]; then
         echo "Compiling $file"
-        if [ "$file" == "./test/err.luna" ]; then
-            ./build/luna "$file" > "$file.txt" --print-ast --no-errors
-        else
-            ./build/luna "$file" > "$file.txt" --print-ast
-        fi
+        ./build/luna "$file" > "$file.txt" --print-ast
     fi
 done

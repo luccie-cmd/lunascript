@@ -2,10 +2,10 @@
 - [ ] Implement a Fully working parser
     - [x] Basic declerations assignments and expressions
     - [ ] Handle EOF and Curly Close '}' errors
-- [ ] Implement a Fullt working SeMa for out AST
-    - [ ] Variables
-    - [ ] Functions
-    - [ ] Expressions
+- [x] Implement a Fullt working SeMa for out AST
+    - [x] Variables
+    - [x] Functions
+    - [x] Expressions
 - [ ] Optimizer
     - [ ] Remove only declerated variables
     - [ ] Remove unused function declerations

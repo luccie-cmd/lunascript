@@ -1,8 +1,7 @@
 func main():i64 {
-    main();
     # Test empty bodies
 }
 
-func main(){
-    
+func main2(){
+    main();
 }

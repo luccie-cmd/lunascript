@@ -1,0 +1,15 @@
+# Exprs
+fmt_print("Hello, World!\n");
+
+# Function decls
+func main():i64 {
+    fmt_print("Privyet\n");
+    # Test empty bodies
+}
+
+main();
+
+# Variable Decls
+var x = 69420;
+var y;
+x = 420;
