@@ -26,11 +26,17 @@ namespace luna{
     }
     
     template<typename T>
-    T vector_pop_back(std::vector<T>& list){
-        T ret = list.back();
-        list.pop_back();
-        return ret;
+    T vector_pop_back(std::vector<T>& list) {
+        if (!list.empty()) {
+            T ret = list.back();
+            list.pop_back();
+            return ret;
+        } else {
+            fmt::print("Cannot pop from an empty list!\n");
+            std::exit(1);
+        }
     }
+
     class Loc{
         private:
             std::string _file;
