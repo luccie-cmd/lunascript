@@ -1,11 +1,3 @@
 # Function calls
 # A lot of format functions are implemented with fmt_[TYPE] 
 fmt_print("Hello, World!\n");
-
-
-# AST
-# |- EXPR
-# |    |- TYPE: Call Expr
-# |    |- NAME: fmt_print
-# |    |- OPERANDS
-# |        |- `Hello, World!\n`
