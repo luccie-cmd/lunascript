@@ -1,12 +1,13 @@
 #if !defined(LUNA_LEXER_HH)
 #define LUNA_LEXER_HH
 #include "core.hh"
+#include "diag.hh"
 #include "token.hh"
 
 namespace luna{
     class Lexer{
         public:
-            Lexer(std::string file, std::string contents) :_contents(contents), idx(0){
+            Lexer(std::string file, std::string contents, Diag diag) :_contents(contents), idx(0), _diag(diag){
                 if(contents.size() == 0){
                     fmt::print("\nInvalid lexical input\n");
                     exit(1);
@@ -24,6 +25,7 @@ namespace luna{
             usz idx;
             std::string _contents;
             Loc loc;
+            Diag _diag;
     };
 };
 

@@ -3,6 +3,7 @@
 #include "core.hh"
 #include "lexer.hh"
 #include "parser.hh"
+#include "diag.hh"
 
 using namespace command_line_options;
 
@@ -19,8 +20,10 @@ int main(int argc, char** argv){
     auto opts = options::parse(argc, argv);
     auto file_name = opts.get<"file">()->path;
     auto file_contents = opts.get<"file">()->contents;
-    Lexer lexer(std::string(file_name), file_contents);
-    Parser parser(lexer);
+    Diag diag;
+    diag.init(true);
+    Lexer lexer(std::string(file_name), file_contents, diag);
+    Parser parser(lexer, diag);
     Ast ast = parser.nodes();
     ast.print();
     return 0;
