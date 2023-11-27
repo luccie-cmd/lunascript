@@ -32,8 +32,18 @@ Token Lexer::next_token(){
     skip_whitespace();
     if(idx >= _contents.size()-1) return Token(TokenType::TT_EOF, "\0", loc);
 
-// include the hardcoded tokens
-#include "tokens.decl"
+    std::vector<Token> hardcoded_tokens = {
+        Token(TokenType::DOT, ".", loc),
+        Token(TokenType::OPEN_PAREN, "(", loc),
+        Token(TokenType::CLOSE_PAREN, ")", loc),
+        Token(TokenType::OPEN_CURLY, "{", loc),
+        Token(TokenType::CLOSE_CURLY, "}", loc),
+        Token(TokenType::SEMICOLON, ";", loc),
+        Token(TokenType::COLON, ":", loc),
+        Token(TokenType::COMMA, ",", loc),
+        Token(TokenType::EQUAL, "=", loc),
+    };
+
     // Find any single tokens
     for(Token t : hardcoded_tokens){
         if(_c == *t._value.c_str()){
