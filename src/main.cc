@@ -5,11 +5,13 @@
 #include "parser.hh"
 #include "diag.hh"
 #include "sema.hh"
+#include "irgen.hh"
 
 using namespace command_line_options;
 
 using options = clopts<
     flag<"--print-ast", "Print the AST">,
+    flag<"--print-ir", "Print the IR">,
     positional<"file", "The file whose contents should be read and compiled", file<>, /*required=*/true>,
     help<>
 >;
@@ -22,6 +24,7 @@ int main(int argc, char** argv){
     auto file_contents = opts.get<"file">()->contents;
     file_contents += '\n';
     bool print_ast = opts.get<"--print-ast">();
+    bool print_ir = opts.get<"--print-ir">();
     Diag diag;
     //       color  exit
     diag.init(true, true);
@@ -31,5 +34,8 @@ int main(int argc, char** argv){
     SeMa sema(ast, diag);
     sema.check();
     if(print_ast) ast.print();
+    IrGen irgen(ast, diag);
+    IR ir = irgen.Generate();
+    if(print_ir) ir.print();
     return 0;
 }

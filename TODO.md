@@ -10,8 +10,8 @@
     - [ ] Remove only declerated variables
     - [ ] Remove unused function declerations
     
-- [ ] Make an IrGen module
-    - [ ] General IR stuff
+- [x] Make an IrGen module
+    - [x] General IR stuff
 - [ ] Make an emiter
     - [ ] X86_64
     - [ ] llvm
