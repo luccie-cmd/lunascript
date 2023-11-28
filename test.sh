@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # This runs all the files in the test folder with extension .luna and drops their results in [NAME].luna.txt
 
-# set -e
+set -e
 
 ./build.sh
 
