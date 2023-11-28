@@ -2,7 +2,7 @@
 
 void luna::SeMa::check(bool is_body){
     if(_ast.get_type() != AstType::ROOT){
-        _diag.ICE("Couldn't verify the AST\nreason: No root defined!\n");
+        _diag.ICE("Unable to verify the AST\n");
     }
     std::vector<AstTypes> children = _ast.get_children();
     for(AstTypes child : children){

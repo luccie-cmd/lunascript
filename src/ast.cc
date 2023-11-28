@@ -1,9 +1,10 @@
 #include "ast.hh"
 
 void luna::Ast::print(std::string prefix, std::string AstName) {
-    if (this->get_type() == AstType::ROOT) {
-        fmt::print("{}{}\n", prefix, AstName);
+    if (this->get_type() != AstType::ROOT) {
+        fmt::print("\033[31mInternal Compiler Error: Unable to verify the AST\033[m");
     }
+    fmt::print("{}{}\n", prefix, AstName);
 
     for (AstTypes child : this->get_children()) {
         try {
