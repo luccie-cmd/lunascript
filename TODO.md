@@ -12,7 +12,6 @@
     
 - [ ] Make an IrGen module
     - [ ] General IR stuff
-    - [ ] Lowering (into x86_64 asm)
 - [ ] Make an emiter
     - [ ] X86_64
     - [ ] llvm
