@@ -27,6 +27,7 @@ void luna::SeMa::check(bool is_body){
     }
     std::vector<luna::Token> args = {};
     declared_functions.push_back(std::make_pair("fmt_print", std::make_pair(TypeHint::I64, 1)));
+    declared_functions.push_back(std::make_pair("exit", std::make_pair(TypeHint::I64, 1)));
     for(std::pair<std::string, std::vector<Token>> called_func : called_functions){
         usz call_size = called_func.second.size();
         std::string call_name = called_func.first;

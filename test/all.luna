@@ -13,3 +13,5 @@ main();
 var x = 69420;
 var y;
 x = 420;
+
+exit(0);
