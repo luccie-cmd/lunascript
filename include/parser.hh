@@ -12,6 +12,7 @@ namespace luna{
                 reverse_vector_in_place<Token>(_tokens);
             }
             Ast nodes();
+            Ast parse_body();
         private:
             std::vector<Token> _tokens;
             Diag _diag;

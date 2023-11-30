@@ -1,17 +1,12 @@
-# Exprs
-fmt_print("Hello, World!\n");
+# Variable Decls
+var x;
+var y;
 
 # Function decls
 func main():i64 {
+    # Exprs
     fmt_print("Privyet\n");
-    # Test empty bodies
+    # Variables
+    x = 420;
+    # return 1;
 }
-
-main();
-
-# Variable Decls
-var x = 69420;
-var y;
-x = 420;
-
-exit(0);

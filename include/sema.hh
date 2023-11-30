@@ -19,6 +19,11 @@ namespace luna{
                     declared_functions.push_back(f);
                 }
             }
+            void add_variable_definitions(std::vector<std::string> names){
+                for(std::string s : names){
+                    varDecl_names.push_back(s);
+                }
+            }
         private:
             std::vector<std::string> varDecl_names;
             std::vector<std::pair<std::string, std::pair<TypeHint, usz>>> declared_functions;

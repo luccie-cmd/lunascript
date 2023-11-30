@@ -40,6 +40,7 @@ void luna::SeMa::check(bool is_body){
     for(Ast a : bodies){
         SeMa sema(a, _diag);
         sema.add_declared_functions(declared_functions);
+        sema.add_variable_definitions(varDecl_names);
         sema.check();
     }
 }

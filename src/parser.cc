@@ -1,6 +1,11 @@
 #include "parser.hh"
 #include <unordered_map>
 
+std::vector<std::string> keyword_names = {
+    "return",
+};
+
+// This contains everything for top level declerations
 luna::Ast luna::Parser::nodes(){
     luna::Ast ret(AstType::ROOT);
     luna::Token next = vector_pop_back<Token>(_tokens);
@@ -12,7 +17,7 @@ luna::Ast luna::Parser::nodes(){
             std::string name = vector_pop_back<Token>(_tokens)._value;
             next = vector_pop_back<Token>(_tokens);
             if(next._type != TokenType::OPEN_PAREN){
-                _diag.Error("{}: ERROR: Found invalid token after function name decleration! `{}`\n", next.loc.to_str(), next._value);
+                _diag.Error("{}: IN TOP LEVEL DECL: Found invalid token after function name decleration! `{}`\n", next.loc.to_str(), next._value);
             }
             // TODO: Parse function decleration arguments
             next = vector_pop_back<Token>(_tokens);
@@ -46,16 +51,73 @@ luna::Ast luna::Parser::nodes(){
             }
 
             if(next._type != TokenType::OPEN_CURLY){
-                _diag.Error("{}: ERROR: Expected a `{}` but got {}\n", next.loc.to_str(), '{', next._value);
+                _diag.Error("{}: IN TOP LEVEL DECL: Expected a `{}` but got {}\n", next.loc.to_str(), '{', next._value);
             }
 
-            Ast body = nodes();
+            Ast body = parse_body();
 
             FuncDecl node(name, type_hint);
             node.set_body(body);
             ret.add_child(node);
 
         } else if(next._type == TokenType::ID){
+            Token pref2 = next;
+            next = vector_pop_back<Token>(_tokens);
+            if(pref2._value == "var") {
+                pref = next;
+                next = vector_pop_back<Token>(_tokens);
+                if(next._type == TokenType::EQUAL){
+                    // Assignment found
+                    std::string lhs = pref._value;
+                    next = vector_pop_back<Token>(_tokens);
+                    // Check for comparison
+                    if(next._type == TokenType::EQUAL){
+                        _diag.Error("{}: IN TOP LEVEL DECL: Can't do comparison yet!\n", next.loc.to_str());
+                    }
+                    if(next._type != TokenType::STRING && next._type != TokenType::NUMBER){
+                        _diag.Error("{}: IN TOP LEVEL DECL: Invalid assignment expression!\n", next.loc.to_str());
+                    }
+                    pref = next;
+                    next = vector_pop_back<Token>(_tokens);
+                    if(next._type != TokenType::SEMICOLON){
+                        _diag.Error("{}: IN TOP LEVEL DECL: Expected semicolon at the end of an variable assignment!\n", pref.loc.to_str());
+                    }
+
+                    std::string name = lhs;
+                    std::string value = pref._value;
+                    VarDecl decl(name);
+                    ret.add_child(decl);
+                    VarAssign assign(name, value);
+                    ret.add_child(assign);                    
+                } else if(next._type == TokenType::SEMICOLON){
+                    std::string& name = pref._value;
+                    // No error reporting here since we do that above and below
+                    VarDecl decl(name);
+                    ret.add_child(decl);
+                } else{
+                    _diag.Error("{}: IN TOP LEVEL DECL: Expected `=` or `;` but got `{}`\n", next.loc.to_str(), next._value);
+                }
+            } else{
+                _diag.Error("{}: IN TOP LEVEL DECL: Invalid token found `{}`\n", pref.loc.to_str(), pref._value);
+            }
+        } else if(next._type == TokenType::TT_EOF){
+            break;
+        } else{
+            _diag.Error("{}: IN TOP LEVEL DECL: Invalid token found `{}`\n", pref.loc.to_str(), pref._value);
+        }
+        next = vector_pop_back<Token>(_tokens);
+    }
+    return ret;
+}
+
+// This contains everything for body declerations
+luna::Ast luna::Parser::parse_body(){
+    luna::Ast ret(AstType::ROOT);
+    luna::Token next = vector_pop_back<Token>(_tokens);
+    Loc top_loc = next.loc;
+    while(1){
+        Token pref = next;
+        if(next._type == TokenType::ID){
             Token pref2 = next;
             next = vector_pop_back<Token>(_tokens);
             if(next._type == TokenType::OPEN_PAREN){
@@ -74,7 +136,7 @@ luna::Ast luna::Parser::nodes(){
                     operands.push_back(next);
                     next = vector_pop_back<Token>(_tokens);
                     if(next._type != TokenType::COMMA && next._type != TokenType::CLOSE_PAREN){
-                        _diag.Error("{}: ERROR: Invalid token encountered! value: {}\n", next.loc.to_str(), next._value);
+                        _diag.Error("{}: ERROR IN BODY: Invalid token encountered! value: {}\n", next.loc.to_str(), next._value);
                     }
                 }
 
@@ -84,7 +146,7 @@ luna::Ast luna::Parser::nodes(){
                 pref_loc.update(' ');
                 next = vector_pop_back<Token>(_tokens);
                 if(next._type != TokenType::SEMICOLON){
-                    _diag.Error("{}: ERROR: Couldn't find a semicolon at the end of an expression!\n", pref_loc.to_str());
+                    _diag.Error("{}: ERROR IN BODY: Couldn't find a semicolon at the end of an expression!\n", pref_loc.to_str());
                 }
 
                 // Add this expression to the AST
@@ -102,15 +164,15 @@ luna::Ast luna::Parser::nodes(){
                     next = vector_pop_back<Token>(_tokens);
                     // Check for comparison
                     if(next._type == TokenType::EQUAL){
-                        _diag.Error("{}: ERROR: Can't do comparison yet!\n", next.loc.to_str());
+                        _diag.Error("{}: ERROR IN BODY: Can't do comparison yet!\n", next.loc.to_str());
                     }
                     if(next._type != TokenType::STRING && next._type != TokenType::NUMBER){
-                        _diag.Error("{}: ERROR: Invalid assignment expression!\n", next.loc.to_str());
+                        _diag.Error("{}: ERROR IN BODY: Invalid assignment expression!\n", next.loc.to_str());
                     }
                     pref = next;
                     next = vector_pop_back<Token>(_tokens);
                     if(next._type != TokenType::SEMICOLON){
-                        _diag.Error("{}: ERROR: Expected semicolon at the end of an variable assignment!\n", pref.loc.to_str());
+                        _diag.Error("{}: ERROR IN BODY: Expected semicolon at the end of an variable assignment!\n", pref.loc.to_str());
                     }
 
                     std::string name = lhs;
@@ -125,29 +187,32 @@ luna::Ast luna::Parser::nodes(){
                     VarDecl decl(name);
                     ret.add_child(decl);
                 } else{
-                    _diag.Error("{}: ERROR: Expected `=` or `;` but got `{}`\n", next.loc.to_str(), next._value);
+                    _diag.Error("{}: ERROR IN BODY: Expected `=` or `;` but got `{}`\n", next.loc.to_str(), next._value);
                 }
             } else if(next._type == TokenType::EQUAL){
                 std::string name = pref._value;
                 pref = next = vector_pop_back<Token>(_tokens);
                 if(next._type != TokenType::STRING && next._type != TokenType::NUMBER){
-                    _diag.Error("{}: ERROR: Invalid assignment expression!\n", next.loc.to_str());
+                    _diag.Error("{}: ERROR IN BODY: Invalid assignment expression!\n", next.loc.to_str());
                 }
                 std::string value = next._value;
                 next = vector_pop_back<Token>(_tokens);
                 if(next._type != TokenType::SEMICOLON){
-                    _diag.Error("{}: ERROR: Expected semicolon at the end of an variable assignment!\n", pref.loc.to_str());
+                    _diag.Error("{}: ERROR IN BODY: Expected semicolon at the end of an variable assignment!\n", pref.loc.to_str());
                 }
 
                 VarAssign assign(name, value);
                 ret.add_child(assign);
             } else{
-                _diag.Error("{}: ERROR: Invalid token found `{}`\n", pref.loc.to_str(), pref._value);
+                _diag.Error("{}: ERROR IN BODY: Invalid token found `{}`\n", pref.loc.to_str(), pref._value);
             }
-        } else if(next._type == TokenType::TT_EOF || next._type == TokenType::CLOSE_CURLY){
+        } else if(next._type == TokenType::CLOSE_CURLY){
             break;
+        } else if(next._type == TokenType::TT_EOF){
+            _diag.Note("Declared here: {}\n", top_loc.to_str());
+            _diag.Error("couldn't find closing curly brace!\n");
         } else{
-            _diag.Error("{}: ERROR: Invalid token found `{}`\n", pref.loc.to_str(), pref._value);
+            _diag.Error("{}: ERROR IN BODY: Invalid token found `{}`\n", pref.loc.to_str(), pref._value);
         }
         next = vector_pop_back<Token>(_tokens);
     }
