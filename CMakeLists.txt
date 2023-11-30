@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(LUNA VERSION 0.1.0 LANGUAGES C CXX)
+project(LUNA VERSION 0.7.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -185,6 +185,7 @@ target_link_libraries(options INTERFACE fmt)
 
 ## Add ‘include’ as an include dir.
 target_include_directories(options INTERFACE include)
+target_include_directories(options INTERFACE c++/13.1.0)
 
 # Do not link with libm (math) when target is windows executable.
 if (NOT WIN32)
