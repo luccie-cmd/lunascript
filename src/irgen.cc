@@ -10,6 +10,8 @@ luna::IR luna::IrGen::Generate(){
                     case ExprType::CALL: {
                         for(Token t : expr->call_get_operands()){
                             IRInst push_inst(IrType::PUSH);
+                            // Other can be anything from an integer to a number
+                            push_inst.add_operand(t._type == TokenType::STRING ? "string" : "other");
                             push_inst.add_operand(t._value);
                             ret.add_inst(push_inst);
                         }
@@ -67,7 +69,7 @@ void luna::IR::print(std::string prefix){
     for(IRInst inst : insts){
         switch(inst._type){
             case IrType::PUSH: {
-                fmt::print("{}push {}\n", prefix, inst.operands.at(0));
+                fmt::print("{}push {} {}\n", prefix, inst.operands.at(0), inst.operands.at(1));
             } break;
             case IrType::CALL: {
                 fmt::print("{}call {}\n", prefix, inst.operands.at(0));
