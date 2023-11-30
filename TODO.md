@@ -13,5 +13,8 @@
 - [x] Make an IrGen module
     - [x] General IR stuff
 - [ ] Make an emiter
-    - [ ] X86_64
-    - [ ] llvm
+    - [ ] X86_64 (nasm code)
+    - [ ] llvm (clang)
+    - [ ] elf object (linkable object)
+    - [ ] elf executable (executable object)
+    - [ ] gnu asm (possible that this isn't going to end up in the compiler)
