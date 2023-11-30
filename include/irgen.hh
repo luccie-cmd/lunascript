@@ -35,6 +35,7 @@ namespace luna{
             // [NOTE TO SELF]: Please use this after calling the Sema not doing any checks in here and otherwise the assembler will complain
             IrGen(Ast ast, Diag diag) :_ast(ast), _diag(diag){}
             [[nodiscard]] IR Generate();
+            [[nodiscard]] IR Generate_func_body();
         private:
             Ast _ast;
             Diag _diag;

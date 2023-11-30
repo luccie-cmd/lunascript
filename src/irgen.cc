@@ -20,26 +20,18 @@ luna::IR luna::IrGen::Generate(){
                         ret.add_inst(inst);
                     } break;
                     default: {
-                        _diag.ICE("No motivation to write errors found (It's in IRGen)\n");
+                        _diag.ICE("Unhandled type found in IRGEN\n");
                     } break;
                 }
             } else if (auto funcDecl = std::get_if<FuncDecl>(&child)) {
                 IRInst inst(IrType::FUNC_DECL);
                 inst.add_operand(funcDecl->get_name()+":");
                 ret.add_inst(inst);
-                // Add the begining of the body decleration
-                inst.operands = {};
-                inst.add_operand(".bdy:");
-                ret.add_inst(inst);
                 IrGen gen(funcDecl->get_body(), _diag);
-                IR body = gen.Generate();
+                IR body = gen.Generate_func_body();
                 for(IRInst i : body.get_insts()){
                     ret.add_inst(i);
                 }
-                // Add the end of the body decleration
-                inst.operands = {};
-                inst.add_operand(".end_bdy:");
-                ret.add_inst(inst);
             } else if (auto varAssign = std::get_if<VarAssign>(&child)) {
                 IRInst inst(IrType::STORE);
                 inst.add_operand(varAssign->get_name());
@@ -61,6 +53,56 @@ luna::IR luna::IrGen::Generate(){
     IRInst inst(IrType::RET);
     inst.add_operand("0");
     ret.add_inst(inst);
+    return ret;
+}
+
+luna::IR luna::IrGen::Generate_func_body(){
+    std::vector<AstTypes> children = _ast.get_children();
+    IR ret;
+    for(usz i = 0; i < children.size(); ++i){
+        AstTypes child = children.at(i);
+
+        IRInst label_inst(IrType::LABEL_DECL);
+        label_inst.add_operand(fmt::format(".bdy_{}:", i));
+        ret.add_inst(label_inst);
+
+        try {
+            if (auto expr = std::get_if<Expr>(&child)) {
+                switch(expr->get_type()){
+                    case ExprType::CALL: {
+                        for(Token t : expr->call_get_operands()){
+                            IRInst push_inst(IrType::PUSH);
+                            // Other can be anything from an integer to a number
+                            push_inst.add_operand(t._type == TokenType::STRING ? "string" : "other");
+                            push_inst.add_operand(t._value);
+                            ret.add_inst(push_inst);
+                        }
+                        IRInst inst(IrType::CALL);
+                        inst.add_operand(expr->call_get_name());
+                        ret.add_inst(inst);
+                    } break;
+                    default: {
+                        _diag.ICE("Unhandled type found in IRGEN\n");
+                    } break;
+                }
+            } else if (auto varAssign = std::get_if<VarAssign>(&child)) {
+                IRInst inst(IrType::STORE);
+                inst.add_operand(varAssign->get_name());
+                inst.add_operand(varAssign->get_value<std::string>());
+                ret.add_inst(inst);
+            } else if (auto varDecl = std::get_if<VarDecl>(&child)) {
+                IRInst inst(IrType::DEFINE);
+                // I want to be able to also define lists and such
+                inst.add_operand("var");
+                inst.add_operand(varDecl->get_name());
+                ret.add_inst(inst);
+            } else {
+                fmt::print("Unexpected variant type!\n");
+            }
+        } catch (const std::exception& ex) {
+            _diag.Error("Exception occured: {}\n", ex.what());
+        }
+    }
     return ret;
 }
 
