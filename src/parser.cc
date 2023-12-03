@@ -1,10 +1,6 @@
 #include "parser.hh"
 #include <unordered_map>
 
-std::vector<std::string> keyword_names = {
-    "return",
-};
-
 // This contains everything for top level declerations
 luna::Ast luna::Parser::nodes(){
     luna::Ast ret(AstType::ROOT);
@@ -110,6 +106,15 @@ luna::Ast luna::Parser::nodes(){
     return ret;
 }
 
+std::vector<std::string> keyword_names = {
+    "return",
+};
+
+// the INT type is an index in the statement kind
+std::vector<std::pair<std::string, int>> keyword_pairs = {
+    {"return", 1}, 
+};
+
 // This contains everything for body declerations
 luna::Ast luna::Parser::parse_body(){
     luna::Ast ret(AstType::ROOT);
@@ -118,6 +123,25 @@ luna::Ast luna::Parser::parse_body(){
     while(1){
         Token pref = next;
         if(next._type == TokenType::ID){
+            bool keyword_found = false;
+            for (const auto& pair : keyword_pairs) {
+                if (pair.first == next._value) {
+                    std::string name = next._value;
+                    next = vector_pop_back<Token>(_tokens);
+                    std::vector<Token> arguments;
+                    while(next._type != TokenType::SEMICOLON){
+                        arguments.push_back(next);
+                        next = vector_pop_back<Token>(_tokens);
+                    }
+                    next = vector_pop_back<Token>(_tokens);
+                    
+                    keyword_found = true;
+                    break;
+                }
+            }
+            if(keyword_found){
+                continue;
+            }
             Token pref2 = next;
             next = vector_pop_back<Token>(_tokens);
             if(next._type == TokenType::OPEN_PAREN){

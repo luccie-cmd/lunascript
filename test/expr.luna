@@ -1,3 +1,5 @@
 # Function calls
 # A lot of format functions are implemented with fmt_[TYPE] 
-fmt_print("Hello, World!\n");
+func main(){
+    fmt_print("Hello, World!\n");
+}
