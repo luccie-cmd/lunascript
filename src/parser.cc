@@ -29,11 +29,13 @@ luna::Ast luna::Parser::nodes(){
                 {"i8", TypeHint::I8},
                 {"i16", TypeHint::I16},
                 {"i32", TypeHint::I32},
-                {"i64", TypeHint::I64}
+                {"i64", TypeHint::I64},
+                {"void", TypeHint::VOID},
             };
             // check if we need to type check
             next = vector_pop_back<Token>(_tokens);
             TypeHint type_hint = TypeHint::I64;
+            bool noreturn = false;
             if(next._type == TokenType::COLON){
                 next = vector_pop_back<Token>(_tokens);
                 std::string hint = next._value;
@@ -43,6 +45,9 @@ luna::Ast luna::Parser::nodes(){
                     std::exit(1);
                 }
                 type_hint = i->second;
+                if(type_hint == TypeHint::VOID){
+                    noreturn = true;
+                }
                 next = vector_pop_back<Token>(_tokens);
             }
 
@@ -54,6 +59,7 @@ luna::Ast luna::Parser::nodes(){
 
             FuncDecl node(name, type_hint);
             node.set_body(body);
+            if(noreturn) node.set_attribute(FuncAttributes::NO_RETURN);
             ret.add_child(node);
 
         } else if(next._type == TokenType::ID){
@@ -110,9 +116,8 @@ std::vector<std::string> keyword_names = {
     "return",
 };
 
-// the INT type is an index in the statement kind
-std::vector<std::pair<std::string, int>> keyword_pairs = {
-    {"return", 1}, 
+std::vector<std::pair<std::string, luna::StmtType>> keyword_pairs = {
+    {"return", luna::StmtType::RETURN}, 
 };
 
 // This contains everything for body declerations
@@ -132,9 +137,14 @@ luna::Ast luna::Parser::parse_body(){
                     while(next._type != TokenType::SEMICOLON){
                         arguments.push_back(next);
                         next = vector_pop_back<Token>(_tokens);
+                        if(next._type != TokenType::COMMA && next._type != TokenType::SEMICOLON) _diag.Error("Expected comma or semicolon but got {}\n", next._value);
+                        if(next._type == TokenType::COMMA) next = vector_pop_back<Token>(_tokens);
                     }
                     next = vector_pop_back<Token>(_tokens);
-                    
+
+                    Stmt stmt(arguments, pair.second);
+                    ret.add_child(stmt);
+
                     keyword_found = true;
                     break;
                 }

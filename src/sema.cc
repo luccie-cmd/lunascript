@@ -18,8 +18,10 @@ void luna::SeMa::check(bool is_body){
                 check_var_assign(*varAssign);
             } else if (auto varDecl = std::get_if<VarDecl>(&child)) {
                 check_var_decl(*varDecl);
+            } else if(auto stmt = std::get_if<Stmt>(&child)){
+                check_stmt(*stmt);
             } else {
-                fmt::print("Unexpected variant type!\n");
+                fmt::print("[SEMA]: Unexpected variant type!\n");
             }
         } catch (const std::exception& ex) {
             _diag.Error("Exception occured: {}\n", ex.what());
@@ -82,5 +84,19 @@ void luna::SeMa::check_var_assign(VarAssign assign){
     std::string name = assign.get_name();
     if(std::find(varDecl_names.begin(), varDecl_names.end(), name) == varDecl_names.end()){
         _diag.Error("Cannot assign to non existant variable `{}`!\n", name);
+    }
+}
+
+void luna::SeMa::check_stmt(Stmt stmt){
+    switch(stmt.get_type()){
+        case StmtType::RETURN: {
+            if(stmt.get_arguments().size() != 1){
+                _diag.Error("Return expects 1 argument but got {} Arguments!\n", stmt.get_arguments().size());
+            }
+        } break;
+        case StmtType::NONE:
+        default: {
+            _diag.ICE("StmtType was Invalid or Unhandled!\n");
+        } break;
     }
 }

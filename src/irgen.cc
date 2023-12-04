@@ -5,30 +5,13 @@ luna::IR luna::IrGen::Generate(){
     IR ret;
     for(AstTypes child : children){
         try {
-            if (auto expr = std::get_if<Expr>(&child)) {
-                switch(expr->get_type()){
-                    case ExprType::CALL: {
-                        for(Token t : expr->call_get_operands()){
-                            IRInst push_inst(IrType::PUSH);
-                            // Other can be anything from an integer to a number
-                            push_inst.add_operand(t._type == TokenType::STRING ? "string" : "other");
-                            push_inst.add_operand(t._value);
-                            ret.add_inst(push_inst);
-                        }
-                        IRInst inst(IrType::CALL);
-                        inst.add_operand(expr->call_get_name());
-                        ret.add_inst(inst);
-                    } break;
-                    default: {
-                        _diag.ICE("Unhandled type found in IRGEN\n");
-                    } break;
-                }
-            } else if (auto funcDecl = std::get_if<FuncDecl>(&child)) {
+            if (auto funcDecl = std::get_if<FuncDecl>(&child)) {
                 IRInst inst(IrType::FUNC_DECL);
                 inst.add_operand(funcDecl->get_name()+":");
+                inst.add_operand(funcDecl->get_typehint_str());
                 ret.add_inst(inst);
                 IrGen gen(funcDecl->get_body(), _diag);
-                IR body = gen.Generate_func_body();
+                IR body = gen.Generate_body();
                 for(IRInst i : body.get_insts()){
                     ret.add_inst(i);
                 }
@@ -50,16 +33,15 @@ luna::IR luna::IrGen::Generate(){
             _diag.Error("Exception occured: {}\n", ex.what());
         }
     }
-    IRInst inst(IrType::RET);
-    inst.add_operand("0");
-    ret.add_inst(inst);
     return ret;
 }
 
-luna::IR luna::IrGen::Generate_func_body(){
+luna::IR luna::IrGen::Generate_body(){
     std::vector<AstTypes> children = _ast.get_children();
     IR ret;
-    for(usz i = 0; i < children.size(); ++i){
+    bool returns = false;
+    usz n = 1;
+    for(usz i = 1; i < children.size(); ++i){
         AstTypes child = children.at(i);
 
         IRInst label_inst(IrType::LABEL_DECL);
@@ -96,12 +78,30 @@ luna::IR luna::IrGen::Generate_func_body(){
                 inst.add_operand("var");
                 inst.add_operand(varDecl->get_name());
                 ret.add_inst(inst);
+            } else if (auto stmt = std::get_if<Stmt>(&child)) {
+                switch(stmt->get_type()){
+                    case StmtType::RETURN: {
+                        IRInst inst(IrType::RET);
+                        inst.add_operand(stmt->get_arguments().at(0)._value);
+                        ret.add_inst(inst);
+                        returns = true;
+                    } break;
+                }
             } else {
-                fmt::print("Unexpected variant type!\n");
+                fmt::print("[IRGEN]: Unexpected variant type!\n");
             }
         } catch (const std::exception& ex) {
             _diag.Error("Exception occured: {}\n", ex.what());
         }
+        n = i;
+    }
+    if(!returns){
+        IRInst label_inst(IrType::LABEL_DECL);
+        label_inst.add_operand(fmt::format(".bdy_{}:", n+1));
+        ret.add_inst(label_inst);
+        IRInst inst(IrType::RET);
+        inst.add_operand("0");
+        ret.add_inst(inst);
     }
     return ret;
 }
@@ -116,7 +116,9 @@ void luna::IR::print(std::string prefix){
             case IrType::CALL: {
                 fmt::print("{}call {}\n", prefix, inst.operands.at(0));
             } break;
-            case IrType::FUNC_DECL:
+            case IrType::FUNC_DECL: {
+                fmt::print("{}{} {}\n", prefix, inst.operands.at(0), inst.operands.at(1));
+            } break;
             case IrType::LABEL_DECL: {
                 fmt::print("{}{}\n", prefix, inst.operands.at(0));
             } break;

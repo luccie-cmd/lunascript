@@ -14,6 +14,7 @@ namespace luna{
             void check_var_assign(VarAssign assign);
             void check_func_decl(FuncDecl decl);
             void check_expr(Expr expr);
+            void check_stmt(Stmt stmt);
             void add_declared_functions(std::vector<std::pair<std::string, std::pair<TypeHint, usz>>> functions){
                 for(std::pair<std::string, std::pair<TypeHint, usz>> f : functions){
                     declared_functions.push_back(f);

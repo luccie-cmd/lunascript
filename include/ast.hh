@@ -7,28 +7,35 @@
 
 namespace luna {
 
-    enum struct AstType : int {
+    enum struct AstType{
         NONE,
         ROOT,
         EXPR,
+        STATEMENT,
         FUNC_DECL,
         VAR_ASSIGN,
         VAR_DECL,
     };
 
-    enum struct ExprType : int {
+    enum struct ExprType{
         NONE,
         CALL,
     };
 
+    enum struct StmtType{
+        NONE,
+        RETURN,
+    };
+
     class Ast;
     class Expr;
+    class Stmt;
     class FuncDecl;
     class VarAssign;
     class VarDecl;
 
     // Forward declaration of AstTypes
-    using AstTypes = std::variant<Expr, FuncDecl, VarDecl, VarAssign>;
+    using AstTypes = std::variant<Expr, Stmt, FuncDecl, VarDecl, VarAssign>;
 
     class Ast {
     public:
@@ -63,6 +70,12 @@ namespace luna {
         I16,
         I32,
         I64,
+        VOID,
+    };
+    
+    enum struct FuncAttributes{
+        NONE=0b00,
+        NO_RETURN=0b01,
     };
 
     class FuncDecl : public Ast {
@@ -81,11 +94,14 @@ namespace luna {
             }
             return "INVALID";
         }
+        bool returns() { return attributes != FuncAttributes::NO_RETURN; }
         usz get_arity(){ return 0; }
+        void set_attribute(FuncAttributes att) { attributes = att; }
     private:
         std::string _name;
         TypeHint _hint;
         Ast body;
+        FuncAttributes attributes;
     };
 
     class VarAssign : public Ast {
@@ -105,6 +121,17 @@ namespace luna {
         const std::string& get_name() const { return _name; }
     private:
         std::string _name;
+    };
+
+    class Stmt : public Ast{
+        public: 
+            Stmt(StmtType type=StmtType::NONE): Ast(AstType::STATEMENT), _type(type){}
+            Stmt(std::vector<Token> args, StmtType type=StmtType::NONE) : Ast(AstType::STATEMENT), _type(type), arguments(args){}
+            StmtType get_type() const { return _type; }
+            std::vector<Token> get_arguments() const { return arguments; }
+        private:
+            std::vector<Token> arguments;
+            StmtType _type;
     };
 
 }

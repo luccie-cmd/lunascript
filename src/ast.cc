@@ -42,8 +42,16 @@ void luna::Ast::print(std::string prefix, std::string AstName) {
             } else if (auto varDecl = std::get_if<VarDecl>(&child)) {
                 fmt::print("{}|- VAR DECL\n", prefix);
                 fmt::print("{}|    |- NAME: `{}`\n", prefix, varDecl->get_name());
+            } else if(auto stmt = std::get_if<Stmt>(&child)){
+                // stmt-
+                switch(stmt->get_type()){
+                    case StmtType::RETURN: {
+                        fmt::print("{}|- ReturnStatement\n", prefix);
+                        fmt::print("{}|    |- Value: {}\n", prefix, stmt->get_arguments().at(0)._value);
+                    } break;
+                }
             } else {
-                fmt::print("Unexpected variant type!\n");
+                fmt::print("[AST]: Unexpected variant type!\n");
             }
         } catch (const std::exception& ex) {
             fmt::print("Exception: {}\n", ex.what());
