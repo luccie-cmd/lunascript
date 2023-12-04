@@ -50,13 +50,23 @@ luna::IR luna::IrGen::Generate_body(){
 
         try {
             if (auto expr = std::get_if<Expr>(&child)) {
+                        fmt::print("Call expr!\n");
                 switch(expr->get_type()){
                     case ExprType::CALL: {
                         for(Token t : expr->call_get_operands()){
+                            fmt::print("Token value = {}\n", t._value);
                             IRInst push_inst(IrType::PUSH);
                             // Other can be anything from an integer to a number
                             push_inst.add_operand(t._type == TokenType::STRING ? "string" : "other");
-                            push_inst.add_operand(t._value);
+                            if(t._type != TokenType::STRING) {
+                                fmt::print("No string\n");
+                                push_inst.add_operand(t._value); 
+                            }
+                            else {
+                                fmt::print("string\n");
+                                ret.strings.push_back(t._value);
+                                push_inst.add_operand(fmt::format("str_{}", ret.strings.size()-1));
+                            }
                             ret.add_inst(push_inst);
                         }
                         IRInst inst(IrType::CALL);
@@ -108,6 +118,9 @@ luna::IR luna::IrGen::Generate_body(){
 
 void luna::IR::print(std::string prefix){
     fmt::print("\nIR\n");
+    for(usz i = 0; i < strings.size(); ++i){
+        fmt::print("str_{}: {}\n", i, strings.at(i));
+    }
     for(IRInst inst : insts){
         switch(inst._type){
             case IrType::PUSH: {

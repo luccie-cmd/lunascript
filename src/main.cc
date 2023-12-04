@@ -6,6 +6,7 @@
 #include "diag.hh"
 #include "sema.hh"
 #include "irgen.hh"
+#include "codegen/x86_64.hh"
 
 using namespace command_line_options;
 
@@ -14,6 +15,12 @@ using options = clopts<
     flag<"--print-ir", "Print the IR">,
     // NOTE: Do proper english on this
     flag<"--no-sema", "Disable the Analasis checks">,
+    option<"-f", "What format to emit code in (default: nasm)", 
+        values<"nasm", 
+               "obj", "elf", 
+               "llvm"
+        >
+    >,
     positional<"file", "The file whose contents should be read and compiled", file<>, /*required=*/true>,
     help<>
 >;
@@ -28,6 +35,7 @@ int main(int argc, char** argv){
     bool print_ast = opts.get<"--print-ast">();
     bool print_ir = opts.get<"--print-ir">();
     bool sema_enable = opts.get<"--no-sema">() ? false : true;
+    auto emit_type = opts.get_or<"-f">("nasm");
     Diag diag;
     if(!sema_enable) diag.Warning("Disableing Sema can have some mistakes!\n");
     //       color  exit

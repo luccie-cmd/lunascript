@@ -23,6 +23,7 @@ namespace luna{
     };
     class IR{
         public:
+            std::vector<std::string> strings;
             IR(){}
             void add_inst(IRInst inst) { insts.push_back(inst); }
             void print(std::string prefix="");
