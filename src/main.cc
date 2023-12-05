@@ -49,5 +49,6 @@ int main(int argc, char** argv){
     IrGen irgen(ast, diag);
     IR ir = irgen.Generate();
     if(print_ir) ir.print();
+    fmt::print("TODO: Emit bytecode / nasm / llvm\n");
     return 0;
 }
