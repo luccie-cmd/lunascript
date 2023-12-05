@@ -12,8 +12,11 @@ luna::IR luna::IrGen::Generate(){
                 ret.add_inst(inst);
                 IrGen gen(funcDecl->get_body(), _diag);
                 IR body = gen.Generate_body();
-                for(IRInst i : body.get_insts()){
-                    ret.add_inst(i);
+                for(std::string s : body.strings){
+                    ret.strings.push_back(s);
+                }
+                for(IRInst inst : body.get_insts()){
+                    ret.add_inst(inst);
                 }
             } else if (auto varAssign = std::get_if<VarAssign>(&child)) {
                 IRInst inst(IrType::STORE);
@@ -22,7 +25,6 @@ luna::IR luna::IrGen::Generate(){
                 ret.add_inst(inst);
             } else if (auto varDecl = std::get_if<VarDecl>(&child)) {
                 IRInst inst(IrType::DEFINE);
-                // I want to be able to also define lists and such
                 inst.add_operand("var");
                 inst.add_operand(varDecl->get_name());
                 ret.add_inst(inst);
@@ -38,6 +40,7 @@ luna::IR luna::IrGen::Generate(){
 
 luna::IR luna::IrGen::Generate_body(){
     std::vector<AstTypes> children = _ast.get_children();
+    std::vector<std::string> vars;
     IR ret;
     bool returns = false;
     usz n = 0;
@@ -50,20 +53,16 @@ luna::IR luna::IrGen::Generate_body(){
 
         try {
             if (auto expr = std::get_if<Expr>(&child)) {
-                        fmt::print("Call expr!\n");
                 switch(expr->get_type()){
                     case ExprType::CALL: {
                         for(Token t : expr->call_get_operands()){
-                            fmt::print("Token value = {}\n", t._value);
                             IRInst push_inst(IrType::PUSH);
                             // Other can be anything from an integer to a number
                             push_inst.add_operand(t._type == TokenType::STRING ? "string" : "other");
                             if(t._type != TokenType::STRING) {
-                                fmt::print("No string\n");
                                 push_inst.add_operand(t._value); 
                             }
                             else {
-                                fmt::print("string\n");
                                 ret.strings.push_back(t._value);
                                 push_inst.add_operand(fmt::format("str_{}", ret.strings.size()-1));
                             }
@@ -84,10 +83,10 @@ luna::IR luna::IrGen::Generate_body(){
                 ret.add_inst(inst);
             } else if (auto varDecl = std::get_if<VarDecl>(&child)) {
                 IRInst inst(IrType::DEFINE);
-                // I want to be able to also define lists and such
-                inst.add_operand("var");
-                inst.add_operand(varDecl->get_name());
+                inst.add_operand("var"); // specify the type
+                inst.add_operand(varDecl->get_name()); // specify the name
                 ret.add_inst(inst);
+                vars.push_back(varDecl->get_name());
             } else if (auto stmt = std::get_if<Stmt>(&child)) {
                 switch(stmt->get_type()){
                     case StmtType::RETURN: {
@@ -113,14 +112,22 @@ luna::IR luna::IrGen::Generate_body(){
         inst.add_operand("0");
         ret.add_inst(inst);
     }
+    for(std::string v : vars){
+        IRInst free_inst(IrType::FREE);
+        free_inst.add_operand(v);
+        ret.add_inst(free_inst);
+    }
     return ret;
 }
 
-void luna::IR::print(std::string prefix){
-    fmt::print("\nIR\n");
+void luna::IR::print(std::string prefix, std::string name){
+    fmt::print("\n{}\n", name);
+    fmt::print("Strings\n");
     for(usz i = 0; i < strings.size(); ++i){
         fmt::print("str_{}: {}\n", i, strings.at(i));
     }
+    fmt::print("End Strings\n\n");
+    fmt::print("Begin {} Body\n", name);
     for(IRInst inst : insts){
         switch(inst._type){
             case IrType::PUSH: {
@@ -129,11 +136,11 @@ void luna::IR::print(std::string prefix){
             case IrType::CALL: {
                 fmt::print("{}call {}\n", prefix, inst.operands.at(0));
             } break;
-            case IrType::FUNC_DECL: {
-                fmt::print("{}{} {}\n", prefix, inst.operands.at(0), inst.operands.at(1));
-            } break;
             case IrType::LABEL_DECL: {
                 fmt::print("{}{}\n", prefix, inst.operands.at(0));
+            } break;
+            case IrType::FUNC_DECL: {
+                fmt::print("{}{} {}\n", prefix, inst.operands.at(0), inst.operands.at(1));
             } break;
             case IrType::STORE: {
                 fmt::print("{}store {} {}\n", prefix, inst.operands.at(0), inst.operands.at(1));
@@ -144,6 +151,13 @@ void luna::IR::print(std::string prefix){
             case IrType::RET: {
                 fmt::print("{}ret {}\n", prefix, inst.operands.at(0));
             } break;
+            case IrType::FREE: {
+                fmt::print("{}free {}\n", prefix, inst.operands.at(0));
+            } break;
+            default: {
+                fmt::print("TODO: Handle IrType: {}\n", static_cast<int>(inst._type));
+            } break;
         }
     }
+    fmt::print("End {} Body\n\n", name);
 }

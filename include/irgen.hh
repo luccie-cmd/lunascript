@@ -13,6 +13,7 @@ namespace luna{
         STORE,
         DEFINE,
         RET,
+        FREE, // Frees a defined thing
     };
     class IRInst{
         public:
@@ -24,9 +25,10 @@ namespace luna{
     class IR{
         public:
             std::vector<std::string> strings;
+
             IR(){}
             void add_inst(IRInst inst) { insts.push_back(inst); }
-            void print(std::string prefix="");
+            void print(std::string prefix="", std::string name="IR");
             std::vector<IRInst> get_insts() { return insts; }
         private:
             std::vector<IRInst> insts;

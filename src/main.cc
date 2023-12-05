@@ -6,7 +6,7 @@
 #include "diag.hh"
 #include "sema.hh"
 #include "irgen.hh"
-#include "codegen/x86_64.hh"
+#include "backend/codegen/x86_64.hh"
 
 using namespace command_line_options;
 
