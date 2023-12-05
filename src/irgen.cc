@@ -40,8 +40,8 @@ luna::IR luna::IrGen::Generate_body(){
     std::vector<AstTypes> children = _ast.get_children();
     IR ret;
     bool returns = false;
-    usz n = 1;
-    for(usz i = 1; i < children.size(); ++i){
+    usz n = 0;
+    for(usz i = 0; i < children.size(); ++i){
         AstTypes child = children.at(i);
 
         IRInst label_inst(IrType::LABEL_DECL);
