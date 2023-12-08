@@ -5,7 +5,7 @@
   - bug fixes,
   - documentation fixes.
 - I do not look into PRs that
-  - implement new features on the compiling/backend,
+  - implement new features on the compiling/backend (this just means that I won't look into it if you add a whole new format),
   - refactor/cleanup the code.
 - What qualifies as a bug, a feature, or refactoring is entirely upon my interpretation.
 
