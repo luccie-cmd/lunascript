@@ -12,6 +12,6 @@ for file in $test_dir/*.luna
 do
     if [ -f "$file" ]; then
         echo "Compiling $file"
-        ./build/luna "$file" > "$file.txt" --print-ast --print-ir
+        ./build/luna "$file" > "$file.txt"
     fi
 done

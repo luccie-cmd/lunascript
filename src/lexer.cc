@@ -32,24 +32,26 @@ Token Lexer::next_token(){
     skip_whitespace();
     if(idx >= _contents.size()-1) return Token(TokenType::TT_EOF, "\0", loc);
 
-    std::vector<Token> hardcoded_tokens = {
-        Token(TokenType::DOT, ".", loc),
-        Token(TokenType::OPEN_PAREN, "(", loc),
-        Token(TokenType::CLOSE_PAREN, ")", loc),
-        Token(TokenType::OPEN_CURLY, "{", loc),
-        Token(TokenType::CLOSE_CURLY, "}", loc),
-        Token(TokenType::SEMICOLON, ";", loc),
-        Token(TokenType::COLON, ":", loc),
-        Token(TokenType::COMMA, ",", loc),
-        Token(TokenType::EQUAL, "=", loc),
-    };
-
-    // Find any single tokens
-    for(Token t : hardcoded_tokens){
-        if(_c == *t._value.c_str()){
+    switch(_c){
+        case '.': case ',':
+        case ';': case ':':
+        case '(': case ')':
+        case '{': case '}': {
+            char pref = _c;
             advance();
-            return t;
-        }
+            std::string value;
+            value.push_back(pref);
+            return Token(static_cast<TokenType>(pref), value, loc);
+        } break;
+
+        // TODO: Handle multiple tokens
+        case '=': {
+            char pref = _c;
+            advance();
+            std::string value;
+            value.push_back(pref);
+            return Token(static_cast<TokenType>(pref), value, loc);
+        } break;
     }
 
     // Check for any ids / numbers
@@ -95,7 +97,6 @@ std::vector<Token> Lexer::lex(){
         next = next_token();
         ret.push_back(next);
     }
-    ret.push_back(Token(TokenType::TT_EOF, "\0", loc));
     return ret;
 }
 
