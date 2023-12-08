@@ -5,6 +5,7 @@
 namespace luna{
     class Diag{
     private:
+        // Define some basic ANSI colors
         enum Color {
             Reset = 0,
             Red = 31,
@@ -15,12 +16,18 @@ namespace luna{
             Cyan = 36,
             White = 37,
         };
+        // Specify if we need to use colors
         bool use_color = true;
+        // Specify if we exit when error or ICE is called
         bool exit_on_error = true;
+
+        // Colors
         Color info_color = Color::Reset;
         Color note_color = Color::Reset;
         Color warning_color = Color::Magenta;
         Color error_color = Color::Red;
+
+        // Color helper
         std::string string_from_color(Color c);
 
     public:

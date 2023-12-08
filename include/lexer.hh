@@ -8,9 +8,8 @@ namespace luna{
     class Lexer{
         public:
             Lexer(std::string file, std::string contents, Diag diag) :_contents(contents), idx(0), _diag(diag){
-                if(contents.size() == 0){
-                    fmt::print("\nInvalid lexical input\n");
-                    exit(1);
+                if(contents.size() <= 0){
+                    diag.Error("Invalid lexical content provided!\n");
                 }
                 _c = contents.at(0);
                 loc = luna::Loc(file);
@@ -18,13 +17,20 @@ namespace luna{
             std::vector<Token> lex();
             Token next_token();
         private:
+            // Advance index by one no mater what 
             void advance();
+            // Skip any characters that we can skip
             void skip_whitespace();
-            bool isskip(int c){ return (_c == ' ' || _c == '\n' || _c == '\r' || _c == '\t'); }
+            bool isskip(int c){ return (_c == ' ' || _c == '\n' || _c == '\r' || _c == '\t' || _c == '\v'); }
+            // Current character
             char _c;
+            // Index in content
             usz idx;
+            // Content itself
             std::string _contents;
+            // Current location
             Loc loc;
+            // Diag class for error reporting
             Diag _diag;
     };
 };

@@ -9,6 +9,7 @@
 #include <string>
 
 namespace luna{
+    // Name some basic types so that I don't have to write them every time
     using u8 = std::uint8_t;
     using u16 = std::uint16_t;
     using u32 = std::uint32_t;
@@ -18,11 +19,12 @@ namespace luna{
     using i32 = std::int32_t;
     using i64 = std::int64_t;
     using usz = std::size_t;
+
+    // Some vector expansions
     template<typename T>
     void reverse_vector_in_place(std::vector<T>& list) {
         std::reverse(list.begin(), list.end());
     }
-    
     template<typename T>
     T vector_pop_back(std::vector<T>& list) {
         if (!list.empty()) {
@@ -35,6 +37,7 @@ namespace luna{
         }
     }
 
+    // A location class for the tokens and AST nodes
     class Loc{
         private:
             std::string _file;

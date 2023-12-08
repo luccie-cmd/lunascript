@@ -4,6 +4,7 @@
 
 namespace luna
 {
+    // Basic tokentypes
     enum struct TokenType : int
     {
         TT_EOF,
