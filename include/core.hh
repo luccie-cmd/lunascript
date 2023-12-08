@@ -10,7 +10,8 @@
 
 #include "diag.hh"
 
-namespace luna{
+namespace luna
+{
     // Name some basic types so that I don't have to write them every time
     using u8 = std::uint8_t;
     using u16 = std::uint16_t;
@@ -23,41 +24,54 @@ namespace luna{
     using usz = std::size_t;
 
     // Some vector expansions
-    template<typename T>
-    void reverse_vector_in_place(std::vector<T>& list) {
+    template <typename T>
+    void reverse_vector_in_place(std::vector<T> &list)
+    {
         std::reverse(list.begin(), list.end());
     }
-    template<typename T>
-    T vector_pop_back(std::vector<T>& list) {
-        if (!list.empty()) {
+    template <typename T>
+    T vector_pop_back(std::vector<T> &list)
+    {
+        if (!list.empty())
+        {
             T ret = list.back();
             list.pop_back();
             return ret;
-        } else {
+        }
+        else
+        {
             fmt::print("Cannot pop from an empty list!\n");
             std::exit(1);
         }
     }
 
     // A location class for the tokens and AST nodes
-    class Loc{
-        private:
-            std::string _file;
-            usz _row = 1, _col = 1;
-        public:
-            Loc() :_file("None"){}
-            Loc(std::string file) :_file(file){}
-            void next_row(){ _row++; _col = 1; }
-            std::string to_str();
-            void update(int c);
+    class Loc
+    {
+    private:
+        std::string _file;
+        usz _row = 1, _col = 1;
+
+    public:
+        Loc() : _file("None") {}
+        Loc(std::string file) : _file(file) {}
+        void next_row()
+        {
+            _row++;
+            _col = 1;
+        }
+        std::string to_str();
+        void update(int c);
     };
-    
-    class Context {
-        public:
-            Diag diag;
-            Context(bool color, bool exit){
-                diag.init(color, exit);
-            }
+
+    class Context
+    {
+    public:
+        Diag diag;
+        Context(bool color, bool exit)
+        {
+            diag.init(color, exit);
+        }
     };
 };
 

@@ -9,12 +9,12 @@ using namespace command_line_options;
 using options = clopts<
     option<"--no-color", "Disables the colored printing">,
     positional<"file", "Path to files that should be compiled", file<>, true>,
-    help<>
->;
+    help<>>;
 
 using namespace luna;
 
-int main(int argc, char** argv){
+int main(int argc, char **argv)
+{
     auto opts = options::parse(argc, argv);
 
     auto file_name = opts.get<"file">()->path;
