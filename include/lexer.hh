@@ -7,9 +7,9 @@
 namespace luna{
     class Lexer{
         public:
-            Lexer(std::string file, std::string contents, Diag diag) :_contents(contents), idx(0), _diag(diag){
+            Lexer(Context ctx, std::string file, std::string contents) :_ctx(ctx), _contents(contents), idx(0){
                 if(contents.size() <= 0){
-                    diag.Error("Invalid lexical content provided!\n");
+                    _ctx.diag.Error("Invalid lexical content provided!\n");
                 }
                 _c = contents.at(0);
                 loc = luna::Loc(file);
@@ -30,8 +30,8 @@ namespace luna{
             std::string _contents;
             // Current location
             Loc loc;
-            // Diag class for error reporting
-            Diag _diag;
+            // Add the current context
+            Context _ctx;
     };
 };
 

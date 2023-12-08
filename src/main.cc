@@ -7,7 +7,8 @@
 using namespace command_line_options;
 
 using options = clopts<
-    positional<"file", "The file whose contents should be read and compiled", file<>, /*required=*/true>,
+    option<"--no-color", "Disables the colored printing">,
+    positional<"file", "Path to files that should be compiled", file<>, true>,
     help<>
 >;
 
@@ -15,16 +16,15 @@ using namespace luna;
 
 int main(int argc, char** argv){
     auto opts = options::parse(argc, argv);
+
     auto file_name = opts.get<"file">()->path;
     auto file_contents = opts.get<"file">()->contents;
-    file_contents += '\n';
-    Diag diag;
-    //       color  exit
-    diag.init(true, false);
-    Lexer lexer(std::string(file_name), file_contents, diag);
-    std::vector<Token> tokens = lexer.lex();
-    for(Token t : tokens){
-        t.print();
-    }
+    file_contents.push_back('\n');
+    // Might be confusing but this just disabeles the color if the flag is present
+    bool color = opts.get<"--no-color">() ? false : true;
+    Context ctx(color, true);
+    Lexer lexer(ctx, std::string(file_name), file_contents);
+    lexer.lex();
+    // Parser parser(ctx, lexer)
     return 0;
 }

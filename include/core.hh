@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <string>
 
+#include "diag.hh"
+
 namespace luna{
     // Name some basic types so that I don't have to write them every time
     using u8 = std::uint8_t;
@@ -48,6 +50,14 @@ namespace luna{
             void next_row(){ _row++; _col = 1; }
             std::string to_str();
             void update(int c);
+    };
+    
+    class Context {
+        public:
+            Diag diag;
+            Context(bool color, bool exit){
+                diag.init(color, exit);
+            }
     };
 };
 

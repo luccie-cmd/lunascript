@@ -83,8 +83,7 @@ Token Lexer::next_token(){
     }
 
     // if all fails exit and print the location
-    _diag.init(true);
-    _diag.Error("{}: ERROR: Invalid token {}\n", loc.to_str(), _c);
+    _ctx.diag.Error("{}: ERROR: Invalid token {}\n", loc.to_str(), _c);
     // Make the compiler shut up
     std::exit(1);
 }
