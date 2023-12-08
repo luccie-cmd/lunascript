@@ -1,17 +1,17 @@
 - [x] Implement a working lexer
 - [ ] Implement a Fully working parser
-    - [x] Basic declerations assignments and expressions
+    - [ ] Basic declerations assignments and expressions
     - [ ] Handle EOF and Curly Close '}' errors
-- [x] Implement a Fullt working SeMa for out AST
-    - [x] Variables
-    - [x] Functions
-    - [x] Expressions
+- [ ] Implement a Fullt working SeMa for out AST
+    - [ ] Variables
+    - [ ] Functions
+    - [ ] Expressions
 - [ ] Optimizer
     - [ ] Remove only declerated variables
     - [ ] Remove unused function declerations
     
-- [x] Make an IrGen module
-    - [x] General IR stuff
+- [ ] Make an IrGen module
+    - [ ] General IR stuff
 - [ ] Make an emiter
     - [ ] X86_64 (nasm code)
     - [ ] llvm (clang)
