@@ -1,7 +1,3 @@
 var x = 69420;
 var y;
-
-func main(){
-    var z;
-    x = 420;
-}
+y = 420;

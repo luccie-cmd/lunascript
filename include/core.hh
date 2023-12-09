@@ -46,13 +46,12 @@ namespace luna
     }
 
     // A location class for the tokens and AST nodes
+    // Also this can't be a struct because of the functions
     class Loc
     {
-    private:
+    public:
         std::string _file;
         usz _row = 1, _col = 1;
-
-    public:
         Loc() : _file("None") {}
         Loc(std::string file) : _file(file) {}
         void next_row()

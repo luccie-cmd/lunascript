@@ -18,7 +18,11 @@ namespace luna
             _c = contents.at(0);
             loc = luna::Loc(file);
         }
+        // lex the whole file at once
         std::vector<Token> lex();
+        // Peek one ahead
+        Token peek();
+        // Get the next token (or current idk)
         Token next_token();
 
     private:

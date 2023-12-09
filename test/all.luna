@@ -1,13 +1,10 @@
 # Variable Decls
 var x;
-var y;
+var y = 69420;
+x = 420;
 
 # Function decls
-func main():i64 {
+func main() {
     # Exprs
     fmt_print("Privyet\n");
-    # Variables
-    x = 420;
-    return 1;
-    x = 69;
 }

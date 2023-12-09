@@ -3,6 +3,7 @@
 #include "core.hh"
 #include "lexer.hh"
 #include "diag.hh"
+#include "parser.hh"
 
 using namespace command_line_options;
 
@@ -24,7 +25,9 @@ int main(int argc, char **argv)
     bool color = opts.get<"--no-color">() ? false : true;
     Context ctx(color, true);
     Lexer lexer(ctx, std::string(file_name), file_contents);
-    lexer.lex();
-    // Parser parser(ctx, lexer)
+    Parser parser(ctx, lexer);
+    parser.parse();
+    Ast ast = parser.get_ast();
+    ast.print();
     return 0;
 }

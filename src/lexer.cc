@@ -124,4 +124,12 @@ namespace luna
         return ret;
     }
 
+    Token Lexer::peek(){
+        usz curr_idx = idx;
+        Token temp = next_token();
+        idx = curr_idx;
+        _c = _contents.at(idx);
+        return temp;
+    }
+
 } // namespace luna
