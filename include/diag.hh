@@ -54,16 +54,15 @@ namespace luna
         void Error(fmt::format_string<Args...> fmt, Args &&...args)
         {
             fmt::print("{}ERROR: {}{}", string_from_color(error_color), fmt::format(fmt, std::forward<Args>(args)...), string_from_color(Color::Reset));
-            if (exit_on_error)
-                std::exit(1);
+            std::exit(Exit_Code());
         }
         template <typename... Args>
         void ICE(fmt::format_string<Args...> fmt, Args &&...args)
         {
             fmt::print("{}Internal Compiler Error: {}{}", string_from_color(error_color), fmt::format(fmt, std::forward<Args>(args)...), string_from_color(Color::Reset));
-            if (exit_on_error)
-                std::exit(1);
+            std::exit(Exit_Code());
         }
+        const int Exit_Code() const { return static_cast<int>(exit_on_error); }
     };
 };
 

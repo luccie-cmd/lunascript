@@ -11,6 +11,7 @@ namespace luna
         ID = 1,
         STRING,
         NUMBER,
+        FLOAT,
         DOT = '.',
         OPEN_PAREN = '(',
         CLOSE_PAREN = ')',

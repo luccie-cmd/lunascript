@@ -18,6 +18,7 @@ namespace luna
         Parser(Context ctx, Lexer lexer) : _ctx(ctx), _lexer(lexer), last_ast_node(false) {}
         AstTypes next_node();
         Ast get_ast();
+        BlockStmt parse_block();
         void parse();
     };
 };

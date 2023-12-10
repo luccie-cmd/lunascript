@@ -1,5 +1,6 @@
 # Function calls
-# A lot of format functions are implemented with fmt_[TYPE] 
 func main(){
-    fmt_print("Hello, World!\n");
+    print("Hello, World!\n");
 }
+
+fmt_print();

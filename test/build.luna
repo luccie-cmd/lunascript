@@ -1,0 +1,35 @@
+# This is for my test build script
+build = true; # To enable interpreting and build system
+
+func setup_build(){
+    set(Languages, CXX); # set the languages
+    set(Language_Standard, 23);
+    set(files, "../src/*.cc"); # All the files must be strings
+    message("Building fmt...");
+    add_git_repository( # Adds a github repository
+        "https://github.com/fmtlib/fmt.git", # Name of the repo
+        "{DESTINATION}/libs/fmt" # Where to place it
+    );
+    add_library(fmt); # Add the libfmt
+
+    include_directory("../include"); # Add include directory
+    include_directory("{DESTINATION}/libs/fmt/include"); # Add include directory
+
+}
+
+project_name = "test"; # The name of the project as well as the executable
+project_version = 0.1.0; # Project version
+destination_dir = "./build"; # Where to output the file
+
+setup_build();
+build(files);
+
+# name = "test"
+# version = "0.1.0"
+# DESTINATION = "./test"
+# LANGUAGES = CXX
+# LANGUAGE STANDARD = 23
+# files = "../src/*.cc"
+# INCLUDE DIRS = "include ./test/libs/fmt/include"
+# build command
+# g++ -o ./test/test -std=c++23 ../src/*.cc -I../include -I./build/libs/fmt/include

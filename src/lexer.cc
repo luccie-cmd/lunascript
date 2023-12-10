@@ -78,13 +78,16 @@ namespace luna
             std::string buffer;
             buffer.push_back(_c);
             advance();
-            while (isalnum(_c) || _c == '_')
+            while (isalnum(_c) || _c == '_' || _c == '.')
             {
                 buffer.push_back(_c);
                 advance();
             }
             if (isdigit(buffer.at(0)))
             {
+                if(buffer.contains('.')){
+                    return Token(TokenType::FLOAT, buffer, loc);
+                }
                 return Token(TokenType::NUMBER, buffer, loc);
             }
             return Token(TokenType::ID, buffer, loc);
@@ -108,7 +111,7 @@ namespace luna
         // if all fails exit and print the location
         _ctx.diag.Error("{}: ERROR: Invalid token {}\n", loc.to_str(), _c);
         // Make the compiler shut up
-        std::exit(1);
+        std::exit(_ctx.diag.Exit_Code());
     }
 
     std::vector<Token> Lexer::lex()
