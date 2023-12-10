@@ -12,6 +12,8 @@ for file in $test_dir/*.luna
 do
     if [ -f "$file" ]; then
         echo "Compiling $file"
-        ./build/luna "$file" > "$file.txt"
+        ./build/luna "$file" > "$file.txt" --ast
     fi
 done
+
+echo "Tests succeded"

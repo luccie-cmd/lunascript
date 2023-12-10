@@ -9,7 +9,7 @@ using namespace command_line_options;
 
 using options = clopts<
     flag<"--no-color", "Disables the colored printing">,
-    flag<"--no-exit", "Disables exit on error (Not advised)">,
+    flag<"--ast", "Prints the AST">,
     positional<"file", "Path to files that should be compiled", file<>, true>,
     help<>>;
 
@@ -24,12 +24,12 @@ int main(int argc, char **argv)
     file_contents.push_back('\n');
     // Might be confusing but this just disabeles the color if the flag is present
     bool color = opts.get<"--no-color">() ? false : true;
-    bool exit = opts.get<"--no-exit">() ? false : true;
+    bool print_ast = opts.get<"--ast">();
     Context ctx(color, exit);
     Lexer lexer(ctx, std::string(file_name), file_contents);
     Parser parser(ctx, lexer);
     parser.parse();
     Ast ast = parser.get_ast();
-    ast.print();
+    if(print_ast) ast.print();
     return 0;
 }
