@@ -36,13 +36,13 @@ void luna::BlockStmt::print(){
             case luna::AstType::VAR_ASSIGN: {
                 fmt::print("        |- Var Assign: {} = {}\n", 
                     std::get<std::shared_ptr<VarAssign>>(types)->get_name(), 
-                    std::get<std::shared_ptr<VarAssign>>(types)->get_value());
+                    std::get<std::shared_ptr<VarAssign>>(types)->get_value()._value);
             } break;
             case luna::AstType::VAR_DECLASSIGN: {
                 fmt::print("        |- Var Decl: {}\n", std::get<std::shared_ptr<VarDeclAssign>>(types)->get_name());
                 fmt::print("        |- Var Assign: {} = {}\n", 
                     std::get<std::shared_ptr<VarDeclAssign>>(types)->get_name(), 
-                    std::get<std::shared_ptr<VarDeclAssign>>(types)->get_value());
+                    std::get<std::shared_ptr<VarDeclAssign>>(types)->get_value()._value);
             } break;
             case luna::AstType::EXPR: {
                 auto expr = std::get<ExprTypes>(types);
@@ -94,13 +94,13 @@ void luna::Ast::print(){
             case luna::AstType::VAR_ASSIGN: {
                 fmt::print("|- Var Assign: {} = {}\n", 
                     std::get<std::shared_ptr<VarAssign>>(child)->get_name(), 
-                    std::get<std::shared_ptr<VarAssign>>(child)->get_value());
+                    std::get<std::shared_ptr<VarAssign>>(child)->get_value()._value);
             } break;
             case luna::AstType::VAR_DECLASSIGN: {
                 fmt::print("|- Var Decl: {}\n", std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name());
                 fmt::print("|- Var Assign: {} = {}\n", 
                     std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name(), 
-                    std::get<std::shared_ptr<VarDeclAssign>>(child)->get_value());
+                    std::get<std::shared_ptr<VarDeclAssign>>(child)->get_value()._value);
             } break;
             case luna::AstType::EXPR: {
                 auto expr = std::get<ExprTypes>(child);
@@ -144,7 +144,7 @@ void luna::Ast::print(){
 }
 
 void luna::BlockStmt::populate_curent_scope(){
-    for(std::pair<std::string, std::string> var : parent_scope.variables){
+    for(std::pair<std::string, Token> var : parent_scope.variables){
         current.variables.insert(var);
     }
     for(std::string func : parent_scope.declared_functions){
@@ -153,7 +153,7 @@ void luna::BlockStmt::populate_curent_scope(){
     for(AstTypes child : _body){
         if (std::shared_ptr<VarDecl>* decl = std::get_if<std::shared_ptr<VarDecl>>(&child)) {
             auto deref = *decl;
-            current.variables.insert(std::make_pair(deref->get_name(), "0"));
+            current.variables.insert(std::make_pair(deref->get_name(), Token(TokenType::NUMBER, "0", Loc("None"))));
         } else if(std::shared_ptr<VarAssign>* assign = std::get_if<std::shared_ptr<VarAssign>>(&child)){
             auto deref = *assign;
             current.variables.insert_or_assign(deref->get_name(), deref->get_value());
@@ -167,7 +167,7 @@ void luna::Ast::populate_scope(){
     for(AstTypes child : children){
         if (std::shared_ptr<VarDecl>* decl = std::get_if<std::shared_ptr<VarDecl>>(&child)) {
             auto deref = *decl;
-            current.variables.insert(std::make_pair(deref->get_name(), "0"));
+            current.variables.insert(std::make_pair(deref->get_name(), Token(TokenType::NUMBER, "0", Loc("None"))));
         } else if(std::shared_ptr<VarAssign>* assign = std::get_if<std::shared_ptr<VarAssign>>(&child)){
             auto deref = *assign;
             current.variables.insert_or_assign(deref->get_name(), deref->get_value());
@@ -181,7 +181,7 @@ void luna::Scope::print(){
     fmt::print("Scope\n");
     fmt::print("Variables in current_scope:\n");
     for (const auto& entry : variables) {
-        fmt::print("Key: {}, Value: {}\n", entry.first, entry.second);
+        fmt::print("Key: {}, Value: {}\n", entry.first, entry.second._value);
     }
     fmt::print("End Scope\n");
 }

@@ -45,7 +45,7 @@ luna::AstTypes luna::Parser::next_node(){
         if(current._type == TokenType::EQUAL){
             // Also an assignment
             current = _lexer.next_token();
-            std::string value = current._value;
+            Token value = current;
             current = _lexer.next_token();
             if(current._type != TokenType::SEMICOLON){
                 current.loc._col -= current._value.size();
@@ -64,7 +64,7 @@ luna::AstTypes luna::Parser::next_node(){
             _ctx.diag.ICE("Lexer Peek stopped working\n");
         }
         current = _lexer.next_token();
-        std::string value = current._value;
+        Token value = current;
         current = _lexer.next_token();
         if(current._type != TokenType::SEMICOLON){
             current.loc._col -= current._value.size();

@@ -6,7 +6,7 @@ func setup_build(){
     set(Language_Standard, 23);
     set(files, "../src/*.cc"); # All the files must be strings
     message("Building fmt...");
-    add_git_repository( # Adds a github repository
+    add_git_repo( # Adds a github repository
         "https://github.com/fmtlib/fmt.git", # Name of the repo
         "{DESTINATION}/libs/fmt" # Where to place it
     );

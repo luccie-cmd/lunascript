@@ -4,6 +4,7 @@
 #include "lexer.hh"
 #include "diag.hh"
 #include "parser.hh"
+#include "sema.hh"
 
 using namespace command_line_options;
 
@@ -30,6 +31,8 @@ int main(int argc, char **argv)
     Parser parser(ctx, lexer);
     parser.parse();
     Ast ast = parser.get_ast();
+    Sema sema(ast, ctx);
+    sema.analyse();
     if(print_ast) ast.print();
     return 0;
 }

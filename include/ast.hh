@@ -47,7 +47,7 @@ namespace luna
     using AstTypes = std::variant<std::shared_ptr<VarDecl>, std::shared_ptr<VarDeclAssign>, std::shared_ptr<VarAssign>, std::shared_ptr<FuncDecl>, ExprTypes, StmtTypes>;
 
     struct Scope{
-        std::unordered_map<std::string, std::string> variables;
+        std::unordered_map<std::string, Token> variables;
         std::vector<std::string> declared_functions;
         void print();
     };
@@ -63,6 +63,7 @@ namespace luna
         {
             _astType = AstType::ROOT;
         }
+        const std::vector<AstTypes> get_children() const { return children; }
         Scope& get_scope() { return current; }
         void add_child(AstTypes child) { children.push_back(child); }
         void populate_scope();
@@ -86,15 +87,15 @@ namespace luna
     {
     private:
         std::string _name;
-        std::string _value;
+        Token _value;
 
     public:
-        VarAssign(std::string name, std::string value) : _name(name), _value(value)
+        VarAssign(std::string name, Token value) : _name(name), _value(value)
         {
             _astType = AstType::VAR_ASSIGN;
         }
         const std::string& get_name() const { return _name; }
-        const std::string& get_value() const { return _value; }
+        const Token& get_value() const { return _value; }
     };
 
     struct Expr : public Shared_Ast
@@ -171,15 +172,15 @@ namespace luna
     class VarDeclAssign : public Shared_Ast{
     private:
         std::string _name;
-        std::string _value;
+        Token _value;
 
     public:
-        VarDeclAssign(std::string name, std::string value) : _name(name), _value(value)
+        VarDeclAssign(std::string name, Token value) : _name(name), _value(value)
         {
             _astType = AstType::VAR_DECLASSIGN;
         }
         const std::string& get_name() const { return _name; }
-        const std::string& get_value() const { return _value; }
+        const Token& get_value() const { return _value; }
     };
 };
 
