@@ -14,12 +14,13 @@ namespace luna{
             Ast _ast;
             Context _ctx;
             SemaContext _sctx;
-            void analyse_build_blockStmt(BlockStmt stmt);
-            void analyse_build_astTypes(AstTypes type);
+            void analyse_blockStmt(BlockStmt stmt);
+            void analyse_astTypes(AstTypes type);
             void setup_sema_build();
         public:
             Sema(Ast ast, Context ctx) :_ast(ast), _ctx(ctx){}
             void analyse();
+            bool is_build(){ return _sctx.build; }
     };
 };
 

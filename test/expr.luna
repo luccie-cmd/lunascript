@@ -2,5 +2,3 @@
 func main(){
     print("Hello, World!\n");
 }
-
-fmt_print();
