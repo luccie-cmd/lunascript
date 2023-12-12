@@ -27,6 +27,7 @@ namespace luna
 
     enum StmtType
     {
+        IMPORT,
         BLOCK,
     };
 
@@ -39,11 +40,12 @@ namespace luna
     class VarDeclAssign; // For decleration and assignments in 1 (really just an VarAssign but now Sema knows too also define it)
     class VarAssign;
     class CallExpr;
+    class ImportStmt;
     class BlockStmt;
     class FuncDecl;
 
     using ExprTypes = std::variant<std::shared_ptr<CallExpr>>;
-    using StmtTypes = std::variant<std::shared_ptr<BlockStmt>>;
+    using StmtTypes = std::variant<ImportStmt*, std::shared_ptr<BlockStmt>>;
     using AstTypes = std::variant<std::shared_ptr<VarDecl>, std::shared_ptr<VarDeclAssign>, std::shared_ptr<VarAssign>, std::shared_ptr<FuncDecl>, ExprTypes, StmtTypes>;
 
     struct Scope{
@@ -133,7 +135,7 @@ namespace luna
         StmtType _stmtType;
         void init()
         {
-            _astType = AstType::EXPR;
+            _astType = AstType::STMT;
         }
     };
 
@@ -153,6 +155,19 @@ namespace luna
         void print();
         void populate_curent_scope();
         const std::vector<AstTypes>& get_body() const { return _body; }
+    };
+
+    class ImportStmt : public Stmt{
+    private:
+        std::string name;
+    public:
+        std::vector<std::string> functions; // TODO: Import variables
+        ImportStmt(std::string _name){
+            _stmtType = StmtType::IMPORT;
+            name = _name;
+        }
+        void print();
+        std::string get_name() { return name; }
     };
 
     class FuncDecl : public Shared_Ast

@@ -18,10 +18,10 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             if(std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name()) != _sctx.declared_variables.end()){
                 _ctx.diag.Error("Variable `{}` is already defined!\n", std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name());
             }
-            if(std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name()) == _sctx.declared_variables.end()){
-                _ctx.diag.Error("Cannot assign to undeclared variable `{}`!\n", std::get<std::shared_ptr<VarAssign>>(child)->get_name());
-            }
             _sctx.declared_variables.push_back(std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name());
+            if(std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name()) == _sctx.declared_variables.end()){
+                _ctx.diag.Error("Cannot assign to undeclared variable `{}`!\n", std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name());
+            }
         } break;
         case luna::AstType::EXPR: {
             auto expr = std::get<ExprTypes>(child);
@@ -43,6 +43,20 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             auto stmt = std::get<StmtTypes>(child);
             StmtType stmtType = static_cast<StmtType>(stmt.index());
             switch (stmtType) {
+                case StmtType::IMPORT: {
+                    std::vector<std::string> imports = {
+                        "std",
+                    };
+                    if(std::find(imports.begin(), imports.end(), std::get<ImportStmt*>(stmt)->get_name()) == imports.end()){
+                        _ctx.diag.Note("Avaliable import types are: {}\n", imports.at(0));
+                        _ctx.diag.Error("Invalid import type: {}\n", std::get<ImportStmt*>(stmt)->get_name());
+                    }
+                    if(std::get<ImportStmt*>(stmt)->get_name() == "std"){
+                        _sctx.declared_functions.push_back("print");
+                        std::get<ImportStmt*>(stmt)->functions.push_back("print");
+                    }
+
+                } break;
                 case StmtType::BLOCK:
                 default: {
                     _ctx.diag.ICE("UNREACHABLE STATEMENT TYPE: {}\n", (int)stmtType);

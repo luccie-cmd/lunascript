@@ -123,6 +123,14 @@ void luna::Ast::print(){
                 auto stmt = std::get<StmtTypes>(child);
                 StmtType stmtType = static_cast<StmtType>(stmt.index());
                 switch (stmtType) {
+                    case StmtType::IMPORT: {
+                        ImportStmt* is = std::get<ImportStmt*>(stmt);
+                        fmt::print("|- Import statement: {}\n", is->get_name());
+                        fmt::print("    |- Imported functions\n");
+                        for(std::string f : is->functions){
+                            fmt::print("        |- Function: {}\n", f);
+                        }
+                    } break;
                     case StmtType::BLOCK:
                     default: {
                         fmt::print("UNREACHABLE STATEMENT TYPE: {}\n", (int)stmtType);

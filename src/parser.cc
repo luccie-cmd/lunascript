@@ -120,6 +120,10 @@ luna::AstTypes luna::Parser::next_node(){
         // last_ast_node = true;
         std::shared_ptr<CallExpr> expr = std::make_shared<CallExpr>(name, arguments);
         return expr;
+    } else if(current._value == "import"){
+        std::string name = _lexer.next_token()._value;
+        ImportStmt* stmt = new ImportStmt(name);
+        return stmt;
     } else{
         current.loc._col -= current._value.size();
         _ctx.diag.Error("{}: Unexpected token `{}`, {}\n", current.loc.to_str(), current._value, (int)current._type);
