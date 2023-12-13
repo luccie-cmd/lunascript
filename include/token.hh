@@ -12,7 +12,6 @@ namespace luna
         STRING,
         NUMBER,
         FLOAT,
-        DOT = '.',
         OPEN_PAREN = '(',
         CLOSE_PAREN = ')',
         OPEN_CURLY = '{',
@@ -40,7 +39,7 @@ namespace luna
         // simple print function that prints that type as an int and the data
         void print()
         {
-            fmt::print("{}: `{}`\n", static_cast<int>(_type), _value);
+            fmt::print("{}: {} `{}`\n", loc.to_str(), static_cast<int>(_type), _value);
         }
         // Stores the location of the token
         Loc loc;
