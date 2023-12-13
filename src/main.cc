@@ -27,6 +27,49 @@ int main(int argc, char **argv)
     bool color = opts.get<"--no-color">() ? false : true;
     bool print_ast = opts.get<"--ast">();
     Context ctx(color, exit);
+
+    Lexer verify_tokens(ctx, std::string(file_name), file_contents);
+    std::vector<Token> tokens = verify_tokens.lex();
+    for(Token t : tokens){
+        switch(t._type){
+            case TokenType::ID: {
+                if(isdigit(t._value.at(0))){
+                    ctx.diag.ICE("{}: Lexer failed to recognize this token as a number\n", t.loc.to_str());
+                }
+            } break;
+            case TokenType::STRING: {
+                bool escape = false;
+                std::string escape_chars = "nbtv\\";
+                for(char c : t._value){
+                    if(escape){
+                        escape = false;
+                        if(!escape_chars.contains(c)){
+                            ctx.diag.Error("Invalid escape character {}!\n", c);
+                        }
+                    }
+                    else if(c == '\\'){
+                        escape = true;
+                    }
+                }
+            } break;
+            case TokenType::NUMBER: {
+                for(char c : t._value){
+                    if(!isdigit(c)){
+                        ctx.diag.Error("{} Invalid numeric literal: {}\n", t.loc.to_str(), c);
+                    }
+                }
+            } break;
+            case TokenType::FLOAT: {
+                for(char c : t._value){
+                    // We only do this to make build system happy (the .)
+                    if(!isdigit(c) && c != '.'){
+                        ctx.diag.Error("{} Invalid float literal: {}\n", t.loc.to_str(), c);
+                    }
+                }
+            } break;
+        }
+    }
+    
     Lexer lexer(ctx, std::string(file_name), file_contents);
     Parser parser(ctx, lexer);
     parser.parse();
