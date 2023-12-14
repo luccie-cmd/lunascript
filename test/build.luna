@@ -1,10 +1,14 @@
 # This is for my test build script
 build = true; # To enable interpreting and build system
 
+var fi;
+fi = "Hello";
+var ie = "Hello";
+
 func setup_build(){
     set(Languages, CXX); # set the languages
     set(Language_Standard, 23);
-    set(files, "../src/*.cc"); # All the files must be strings
+    set(files, "../src/*.cc", true); # All the files must be strings last argument is optional but just enables recursion
     message("Building fmt...");
     add_git_repo( # Adds a github repository
         "https://github.com/fmtlib/fmt.git", # Name of the repo
@@ -19,7 +23,7 @@ func setup_build(){
 
 project_name = "test"; # The name of the project as well as the executable
 project_version = 0.1.0; # Project version
-destination_dir = "./build"; # Where to output the file
+destination_dir = "./test/build"; # Where to output the file
 
 setup_build();
 build(files);

@@ -7,14 +7,15 @@ namespace luna{
     // A container for storing things used in all the Sema Funcitons
     struct SemaContext {
         std::vector<std::string> declared_variables, declared_functions;
-        bool build; // For enabeling the build system
+        std::string defined_function; // Function wherein we currently are
+        bool build, is_body; // For enabeling the build system
     };
     class Sema{
         private:
             Ast _ast;
             Context _ctx;
             SemaContext _sctx;
-            void analyse_blockStmt(BlockStmt stmt);
+            void analyse_blockStmt(std::string name, BlockStmt stmt);
             void analyse_astTypes(AstTypes type);
             void setup_sema_build();
         public:

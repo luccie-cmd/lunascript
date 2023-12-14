@@ -64,13 +64,16 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             }
         } break;
         case luna::AstType::FUNC_DECL: {
+            if(_sctx.is_body){
+                _ctx.diag.Error("Cannot define function `{}` inside of function `{}`!\n", std::get<std::shared_ptr<FuncDecl>>(child)->get_name(), _sctx.defined_function);
+            }
             if(std::find(_sctx.declared_functions.begin(), _sctx.declared_functions.end(), std::get<std::shared_ptr<FuncDecl>>(child)->get_name()) != _sctx.declared_functions.end()){
                 _ctx.diag.Error("Function `{}` is already defined!\n", std::get<std::shared_ptr<FuncDecl>>(child)->get_name());
             }
             _sctx.declared_functions.push_back(std::get<std::shared_ptr<FuncDecl>>(child)->get_name());
 
             SemaContext sctx_old = _sctx;
-            analyse_blockStmt(std::get<std::shared_ptr<FuncDecl>>(child)->get_body());
+            analyse_blockStmt(std::get<std::shared_ptr<FuncDecl>>(child)->get_name(), std::get<std::shared_ptr<FuncDecl>>(child)->get_body());
             _sctx = sctx_old;
         } break;
         case luna::AstType::ROOT:
@@ -82,6 +85,7 @@ void luna::Sema::analyse_astTypes(AstTypes child){
 
 void luna::Sema::analyse(){
     _sctx.build = false;
+    _sctx.is_body = false;
     for (AstTypes child : _ast.get_children()) {
         if (auto assign = std::get_if<std::shared_ptr<VarAssign>>(&child)) {
             if (assign->get()->get_name() == "build") {
@@ -96,10 +100,13 @@ void luna::Sema::analyse(){
         analyse_astTypes(child);
     }
 }
-void luna::Sema::analyse_blockStmt(BlockStmt stmt){
+void luna::Sema::analyse_blockStmt(std::string name, BlockStmt stmt){
+    _sctx.is_body = true;
+    _sctx.defined_function = name;
     for(AstTypes child : stmt.get_body()){
         analyse_astTypes(child);
     }
+    _sctx.is_body = false;
 }
 
 void luna::Sema::setup_sema_build(){
