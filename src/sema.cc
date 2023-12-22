@@ -114,6 +114,7 @@ void luna::Sema::setup_sema_build(){
     _sctx.declared_variables.push_back("project_name");
     _sctx.declared_variables.push_back("project_version");
     _sctx.declared_variables.push_back("destination_dir");
+    _sctx.declared_variables.push_back("libs_path");
 
     _sctx.declared_functions.push_back("build");
     _sctx.declared_functions.push_back("set");

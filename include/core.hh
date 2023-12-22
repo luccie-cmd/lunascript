@@ -66,8 +66,9 @@ namespace luna
     class Context
     {
     public:
+        bool verbose;
         Diag diag;
-        Context(bool color, bool exit)
+        Context(bool color, bool exit, bool _verbose) :verbose(_verbose)
         {
             diag.init(color, exit);
         }

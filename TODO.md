@@ -1,11 +1,11 @@
 - [x] Implement a working lexer
-- [ ] Implement a Fully working parser
-    - [ ] Basic declerations assignments and expressions
-    - [ ] Handle EOF and Curly Close '}' errors
-- [ ] Implement a Fullt working SeMa for out AST
-    - [ ] Variables
-    - [ ] Functions
-    - [ ] Expressions
+- [x] Implement a Fully working parser
+    - [x] Basic declerations assignments and expressions and statements
+- [x] Implement a Fullt working SeMa for out AST
+    - [x] Variables
+    - [x] Functions
+    - [x] Expressions
+    - [x] Statements
 - [ ] Optimizer
     - [ ] Remove only declerated variables
     - [ ] Remove unused function declerations
@@ -18,3 +18,7 @@
     - [ ] elf object (linkable object)
     - [ ] elf executable (executable object)
     - [ ] gnu asm (possible that this isn't going to end up in the compiler)
+
+- [ ] Build inpreter stuff
+    - [ ] Support fuck ton of languages
+    - [ ] Don't rebuild files that haven't changed

@@ -11,6 +11,7 @@ using namespace command_line_options;
 using options = clopts<
     flag<"--no-color", "Disables the colored printing">,
     flag<"--ast", "Prints the AST">,
+    flag<"-v", "Enables verbose option">,
     positional<"file", "Path to files that should be compiled", file<>, true>,
     help<>>;
 
@@ -26,7 +27,12 @@ int main(int argc, char **argv)
     // Might be confusing but this just disabeles the color if the flag is present
     bool color = opts.get<"--no-color">() ? false : true;
     bool print_ast = opts.get<"--ast">();
-    Context ctx(color, exit);
+    bool verbose = opts.get<"-v">();
+    Context ctx(color, true, verbose);
+
+    if(verbose){
+        fmt::print("File name: {}\n", file_name.c_str());
+    }
 
     Lexer verify_tokens(ctx, std::string(file_name), file_contents);
     std::vector<Token> tokens = verify_tokens.lex();

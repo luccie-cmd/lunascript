@@ -39,8 +39,7 @@ void luna::BlockStmt::print(){
                     std::get<std::shared_ptr<VarAssign>>(types)->get_value()._value);
             } break;
             case luna::AstType::VAR_DECLASSIGN: {
-                fmt::print("        |- Var Decl: {}\n", std::get<std::shared_ptr<VarDeclAssign>>(types)->get_name());
-                fmt::print("        |- Var Assign: {} = {}\n", 
+                fmt::print("        |- Var Decl Assign: {} = {}\n",
                     std::get<std::shared_ptr<VarDeclAssign>>(types)->get_name(), 
                     std::get<std::shared_ptr<VarDeclAssign>>(types)->get_value()._value);
             } break;

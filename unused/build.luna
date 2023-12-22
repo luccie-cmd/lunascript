@@ -1,0 +1,66 @@
+# This is for my test build script
+import std
+build = true; # To enable interpreting and build system
+project_name = "test"; # The name of the project as well as the executable
+project_version = 0.1.0; # Project version
+destination_dir = "./test/build"; # Where to output the file
+libs_path = "{DESTINATION}/libs";
+
+func setup_build(){
+    set(Languages, CXX); # set the languages
+    set(CXX_Language_Standard, 23);
+    set(files, "./src", true); # All the files are directories and must be strings the last argument is optional but just enables recursion
+    print("Building fmt...\n");
+    add_git_repo( # Adds a github repository
+        "https://github.com/fmtlib/fmt.git", # Name of the repo
+        "{DESTINATION}/libs/fmt" # Where to place it
+    );
+    add_library(fmt); # Add the libfmt
+
+    include_directory("../include"); # Add include directory
+    include_directory("{DESTINATION}/libs/fmt/include"); # Add include directory
+
+}
+
+setup_build();
+set(arguments,
+    "-Wall", "-Wextra",     # Enable ‘all’ warnings.
+    "-Wundef",           # Invalid #undef or undefined macro in #if.
+    "-Wcast-align",      # Casting that changes alignment.
+    "-Wconversion",      # Implicit conversions.
+    "-Wsign-conversion", # Implicit sign conversions.
+    "-Wformat=2",        # Stricter format checking.
+    "-Wunused-variable",
+
+    # Disabled warnings.
+    "-Wno-unused-function",
+    "-Wno-unused-local-typedefs",
+    "-Wno-unused-parameter",
+
+    # NULL Errors.
+    "-Werror=nonnull", # Passing NULL to nonnull parameter.
+
+    # Memory Errors.
+    "-Werror=address",              # Suspicious use of addresses.
+    "-Werror=init-self",            # Initialization of a variable with itself.
+    "-Werror=uninitialized",
+
+    # Return type.
+    "-Werror=return-type",
+
+    # C/C++.
+    "-Werror=implicit-fallthrough",
+    "-Werror=missing-include-dirs", # User-specified include dir does not exist.
+    "-Werror=pointer-arith", # Disallow void* and function pointer arithmetic.
+    "-Werror=string-compare", # Nonsensical string comparisons.
+    "-Werror=switch", # Missing switch cases.
+    "-Werror=write-strings", # Strings in C should be const char*.
+
+    # C++.
+    "-Werror=missing-field-initializers",
+    "-Werror=non-virtual-dtor",
+    "-Werror=pessimizing-move",
+    "-fsanitize=address"
+);
+print("Building main...\n");
+build();
