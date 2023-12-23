@@ -21,7 +21,9 @@ namespace luna
         Ast get_ast();
         BlockStmt parse_block();
         std::shared_ptr<FuncDecl> parse_func_decl(Linkage linkage=Linkage::INTERNAL);
-        std::variant<std::shared_ptr<VarDecl>, std::shared_ptr<VarDeclAssign>, std::shared_ptr<VarAssign>> parse_var_decl();
+        std::variant<std::shared_ptr<VarDecl>, std::shared_ptr<VarDeclAssign>> parse_var_decl();
+        std::shared_ptr<VarAssign> parse_var_assign();
+        std::shared_ptr<CallExpr> parse_call_expr();
         void parse();
     };
 };

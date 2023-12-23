@@ -78,7 +78,7 @@ std::shared_ptr<luna::FuncDecl> luna::Parser::parse_func_decl(Linkage linkage){
     return std::make_shared<FuncDecl>(name, block, linkage, arguments);
 }
 
-std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign>, std::shared_ptr<luna::VarAssign>> luna::Parser::parse_var_decl(){
+std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign>> luna::Parser::parse_var_decl(){
     std::string name = _lexer.next_token()._value;
 
     current = _lexer.next_token();
@@ -96,10 +96,54 @@ std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign
             _ctx.diag.Error("{}: Expected ';' before '{}'\n", current.loc.to_str(), current._value);
         }
         return std::make_shared<VarDeclAssign>(name, value);
-    } else{
-        // Just a decl
-        return std::make_shared<VarDecl>(name);
     }
+    return std::make_shared<VarDecl>(name);
+}
+
+std::shared_ptr<luna::VarAssign> luna::Parser::parse_var_assign(){
+    std::string name = current._value;
+    current = _lexer.next_token();
+    if(current._type != TokenType::EQUAL){
+        _ctx.diag.ICE("Lexer Peek stopped working\n");
+    }
+    current = _lexer.next_token();
+    Token value = current;
+    current = _lexer.next_token();
+    if(current._type != TokenType::SEMICOLON){
+        current.loc._col -= current._value.size();
+        _ctx.diag.Error("{}: Expected ';' before '{}'\n", current.loc.to_str(), current._value);
+    }
+    return std::make_shared<VarAssign>(name, value);
+}
+
+std::shared_ptr<luna::CallExpr> luna::Parser::parse_call_expr(){
+    std::string name = current._value;
+    current = _lexer.next_token();
+    if(current._type != TokenType::OPEN_PAREN){
+        _ctx.diag.ICE("Lexer Peek stopped working\n");
+    }
+    std::vector<Token> arguments;
+    current = _lexer.next_token();
+    while(current._type != TokenType::CLOSE_PAREN){
+        arguments.push_back(current);
+        current = _lexer.next_token();
+        if(current._type == TokenType::CLOSE_PAREN){
+            current = _lexer.next_token();
+            break;
+        }
+        if(current._type != TokenType::COMMA){
+            _ctx.diag.Error("{}: Expected `,` before `{}`\n", current.loc.to_str(), current._value);
+        }
+        current = _lexer.next_token();
+    }
+    if(current._type == TokenType::CLOSE_PAREN){
+        current = _lexer.next_token();
+    }
+    if(current._type != TokenType::SEMICOLON){
+        _ctx.diag.Error("{}: Expected `;` before `{}`\n", current.loc.to_str(), current._value);
+    }
+    
+    return std::make_shared<CallExpr>(name, arguments);
 }
 
 luna::AstTypes luna::Parser::next_node(){
@@ -112,27 +156,13 @@ luna::AstTypes luna::Parser::next_node(){
     }
     // First off handle variable declerations
     if(current._value == VAR_DECL_NAME){
-        std::variant<std::shared_ptr<VarDecl>, std::shared_ptr<VarDeclAssign>, std::shared_ptr<VarAssign>> decl = parse_var_decl();
+        std::variant<std::shared_ptr<VarDecl>, std::shared_ptr<VarDeclAssign>> decl = parse_var_decl();
         switch(decl.index()+1){
             case AstType::VAR_DECL: return std::get<std::shared_ptr<VarDecl>>(decl);
             case AstType::VAR_DECLASSIGN: return std::get<std::shared_ptr<VarDeclAssign>>(decl);
-            case AstType::VAR_ASSIGN: return std::get<std::shared_ptr<VarAssign>>(decl);
         }
     } else if(_lexer.peek()._type == TokenType::EQUAL && current._type == TokenType::ID){
-        std::string name = current._value;
-        current = _lexer.next_token();
-        if(current._type != TokenType::EQUAL){
-            _ctx.diag.ICE("Lexer Peek stopped working\n");
-        }
-        current = _lexer.next_token();
-        Token value = current;
-        current = _lexer.next_token();
-        if(current._type != TokenType::SEMICOLON){
-            current.loc._col -= current._value.size();
-            _ctx.diag.Error("{}: Expected ';' before '{}'\n", current.loc.to_str(), current._value);
-        }
-        auto assign = std::make_shared<VarAssign>(name, value);
-        return assign;
+        return parse_var_assign();
     } else if(current._value == FUNC_DECL_NAME){
         return parse_func_decl(Linkage::INTERNAL);
     } else if(current._value == "import"){
@@ -147,39 +177,12 @@ luna::AstTypes luna::Parser::next_node(){
         current = _lexer.next_token();
         return parse_func_decl(Linkage::EXPORTED);
     } else if(current._type == TokenType::ID && _lexer.peek()._type == TokenType::OPEN_PAREN){
-        std::string name = current._value;
-        current = _lexer.next_token();
-        if(current._type != TokenType::OPEN_PAREN){
-            _ctx.diag.ICE("Lexer Peek stopped working\n");
-        }
-        std::vector<Token> arguments;
-        current = _lexer.next_token();
-        while(current._type != TokenType::CLOSE_PAREN){
-            arguments.push_back(current);
-            current = _lexer.next_token();
-            if(current._type == TokenType::CLOSE_PAREN){
-                current = _lexer.next_token();
-                break;
-            }
-            if(current._type != TokenType::COMMA){
-                _ctx.diag.Error("{}: Expected `,` before `{}`\n", current.loc.to_str(), current._value);
-            }
-            current = _lexer.next_token();
-        }
-        if(current._type == TokenType::CLOSE_PAREN){
-            current = _lexer.next_token();
-        }
-        if(current._type != TokenType::SEMICOLON){
-            _ctx.diag.Error("{}: Expected `;` before `{}`\n", current.loc.to_str(), current._value);
-        }
-
-        // last_ast_node = true;
-        std::shared_ptr<CallExpr> expr = std::make_shared<CallExpr>(name, arguments);
-        return expr;
+        return parse_call_expr();
     } else{
         current.loc._col -= current._value.size();
         _ctx.diag.Error("{}: Unexpected token `{}`, {}\n", current.loc.to_str(), current._value, (int)current._type);
     }
+
     ast.print();
     _ctx.diag.ICE("Unreturned Ast node!\n");
     std::exit(0);
