@@ -177,6 +177,7 @@ namespace luna
         const BlockStmt get_body() const { return _body; }
         const std::vector<std::string> get_func_arguments() const { return _func_arguments; }
         const Linkage get_linkage() const { return linkage; }
+        void set_linkage(Linkage link) { linkage = link; }
     };
 
     class VarDeclAssign : public Shared_Ast{

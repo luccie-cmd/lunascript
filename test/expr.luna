@@ -1,6 +1,6 @@
 # Function calls
 import func puts(str); # This will add an imported function called puts
 
-export func main(){
+func main(){
     puts("Hello, World!\n"); # Use puts
 }

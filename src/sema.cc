@@ -89,6 +89,9 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             if(std::find(_sctx.declared_functions.begin(), _sctx.declared_functions.end(), func_decl) != _sctx.declared_functions.end()){
                 _ctx.diag.Error("Function `{}` is already defined!\n", std::get<std::shared_ptr<FuncDecl>>(child)->get_name());
             }
+            if(std::get<std::shared_ptr<FuncDecl>>(child)->get_name() == "main"){
+                std::get<std::shared_ptr<FuncDecl>>(child)->set_linkage(Linkage::EXPORTED);
+            }
             _sctx.declared_functions.push_back(func_decl);
 
             SemaContext sctx_old = _sctx;
