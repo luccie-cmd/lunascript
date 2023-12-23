@@ -4,4 +4,5 @@ y = 420;
 func main(){
     var z;
     z = 69;
+    return 0;
 }

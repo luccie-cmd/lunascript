@@ -63,6 +63,8 @@ namespace luna
         void update(int c);
     };
 
+    bool string_is_int(std::string string);
+
     class Context
     {
     public:

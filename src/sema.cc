@@ -75,6 +75,19 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             auto stmt = std::get<StmtTypes>(child);
             StmtType stmtType = static_cast<StmtType>(stmt.index());
             switch (stmtType) {
+                case StmtType::RETURN: {
+                    if(!_sctx.is_body){
+                        _ctx.diag.Error("Cannot return in non function body!\n");
+                    }
+                    std::shared_ptr<ReturnStmt> ret_stmt = std::get<std::shared_ptr<ReturnStmt>>(stmt);
+                    if(ret_stmt.get()->get_return_value() != "None"){
+                        if(!string_is_int(ret_stmt.get()->get_return_value())){
+                            if(std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), ret_stmt.get()->get_return_value()) == _sctx.declared_variables.end()){
+                                _ctx.diag.Error("Cannot return undeclared variable `{}`\n", ret_stmt.get()->get_return_value());
+                            }
+                        }
+                    }
+                } break;
                 case StmtType::BLOCK:
                 default: {
                     _ctx.diag.ICE("UNREACHABLE STATEMENT TYPE: {}\n", (int)stmtType);

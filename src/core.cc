@@ -71,8 +71,12 @@ void luna::BlockStmt::print(){
             } break;
             case luna::AstType::STMT: {
                 auto stmt = std::get<StmtTypes>(types);
-                StmtType stmtType = static_cast<StmtType>(stmt.index()+1);
+                StmtType stmtType = static_cast<StmtType>(stmt.index());
                 switch (stmtType) {
+                    case StmtType::RETURN: {
+                        fmt::print("        |- Return Stmt\n");
+                        fmt::print("            |- Value: {}\n", std::get<std::shared_ptr<ReturnStmt>>(stmt)->get_return_value());
+                    } break;
                     case StmtType::BLOCK:
                     default: {
                         fmt::print("UNREACHABLE STATEMENT TYPE: {}\n", (int)stmtType);
@@ -131,6 +135,7 @@ void luna::Ast::print(){
                 StmtType stmtType = static_cast<StmtType>(stmt.index());
                 switch (stmtType) {
                     case StmtType::BLOCK:
+                    case StmtType::RETURN:
                     default: {
                         fmt::print("UNREACHABLE STATEMENT TYPE: {}\n", (int)stmtType);
                     } break;
@@ -196,4 +201,13 @@ void luna::Scope::print(){
         fmt::print("Key: {}, Value: {}\n", entry.first, entry.second._value);
     }
     fmt::print("End Scope\n");
+}
+
+bool luna::string_is_int(std::string string){
+    for(char c : string){
+        if(!isdigit(c)){
+            return false;
+        }
+    }
+    return true;
 }

@@ -1,12 +1,14 @@
 # Imported function
 import func imported();
 
-# Exported function
-func main(){
-    imported();
-}
-
 # Internal function
 func main2(){
-    main();
+    imported();
+    return;
+}
+
+# Exported function
+func main(){
+    main2();
+    return 0;
 }

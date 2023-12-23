@@ -12,6 +12,7 @@ using options = clopts<
     flag<"--no-color", "Disables the colored printing">,
     flag<"--ast", "Prints the AST">,
     flag<"-v", "Enables verbose option">,
+    flag<"--no-sema", "Disables the semantic analysis">,
     positional<"file", "Path to files that should be compiled", file<>, true>,
     help<>>;
 
@@ -28,6 +29,7 @@ int main(int argc, char **argv)
     bool color = opts.get<"--no-color">() ? false : true;
     bool print_ast = opts.get<"--ast">();
     bool verbose = opts.get<"-v">();
+    bool sema_enable = opts.get<"--no-sema">() ? false : true;
     Context ctx(color, true, verbose);
 
     if(verbose){
@@ -81,7 +83,9 @@ int main(int argc, char **argv)
     parser.parse();
     Ast ast = parser.get_ast();
     Sema sema(ast, ctx);
-    sema.analyse();
+    if(sema_enable){
+        sema.analyse();
+    }
     if(print_ast) ast.print();
     return 0;
 }

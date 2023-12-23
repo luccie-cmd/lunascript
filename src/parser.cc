@@ -15,7 +15,7 @@ luna::BlockStmt luna::Parser::parse_block(){
         _lexer.next_token();
         return stmt;
     }
-    while(current._type != TokenType::CLOSE_CURLY){
+    while(current._type != TokenType::CLOSE_CURLY && !last_ast_node){
         AstTypes types = next_node();
         stmt.add_body(types);
         stmt.populate_curent_scope();
@@ -176,6 +176,17 @@ luna::AstTypes luna::Parser::next_node(){
     } else if(current._value == "export"){
         current = _lexer.next_token();
         return parse_func_decl(Linkage::EXPORTED);
+    } else if(current._value == "return"){
+        current = _lexer.next_token();
+        if(current._type == TokenType::SEMICOLON){
+            return std::make_shared<ReturnStmt>("None");
+        }
+        std::string ret_value = current._value;
+        current = _lexer.next_token();
+        if(current._type != TokenType::SEMICOLON){
+            _ctx.diag.Error("{}: Expected `;` before `{}`\n", current.loc.to_str(), current._value);
+        }
+        return std::make_shared<ReturnStmt>(ret_value);
     } else if(current._type == TokenType::ID && _lexer.peek()._type == TokenType::OPEN_PAREN){
         return parse_call_expr();
     } else{

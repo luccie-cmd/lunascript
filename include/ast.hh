@@ -34,6 +34,7 @@ namespace luna
     enum StmtType
     {
         BLOCK,
+        RETURN,
     };
 
     struct Shared_Ast
@@ -46,10 +47,11 @@ namespace luna
     class VarAssign;
     class CallExpr;
     class BlockStmt;
+    class ReturnStmt;
     class FuncDecl;
 
     using ExprTypes = std::variant<std::shared_ptr<CallExpr>>;
-    using StmtTypes = std::variant<std::shared_ptr<BlockStmt>>;
+    using StmtTypes = std::variant<std::shared_ptr<BlockStmt>, std::shared_ptr<ReturnStmt>>;
     using AstTypes = std::variant<std::shared_ptr<VarDecl>, std::shared_ptr<VarDeclAssign>, std::shared_ptr<VarAssign>, std::shared_ptr<FuncDecl>, ExprTypes, StmtTypes>;
 
     struct Scope{
@@ -159,6 +161,14 @@ namespace luna
         void print();
         void populate_curent_scope();
         const std::vector<AstTypes>& get_body() const { return _body; }
+    };
+
+    class ReturnStmt : public Stmt{
+        private:
+            std::string return_value;
+        public:
+            ReturnStmt(std::string ret_value) :return_value(ret_value){ _stmtType = StmtType::RETURN; }
+            const std::string get_return_value() const { return return_value; }
     };
 
     class FuncDecl : public Shared_Ast

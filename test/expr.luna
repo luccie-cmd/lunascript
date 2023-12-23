@@ -3,4 +3,5 @@ import func puts(str); # This will add an imported function called puts
 
 func main(){
     puts("Hello, World!\n"); # Use puts
+    return 0;
 }
