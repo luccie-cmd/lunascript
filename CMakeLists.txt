@@ -194,6 +194,10 @@ endif()
 file(GLOB SOURCES "src/*.cc" "src/*/*.cc" "include/*.hh" "include/*/*.hh")
 include_directories(include)
 
+# Add the map file to the target
+set(MAP_FILE_PATH "${CMAKE_CURRENT_BINARY_DIR}/main.map")
+add_link_options("-Wl,-Map=${MAP_FILE_PATH}")
+
 add_executable(luna ${SOURCES})
 target_link_libraries(luna fmt)
 
