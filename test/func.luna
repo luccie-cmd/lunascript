@@ -1,7 +1,12 @@
-func main(){
+# Exported function
+export func main(){
 
 }
 
+# Imported function
+import func imported();
+
+# Internal function
 func main2(){
     main();
 }

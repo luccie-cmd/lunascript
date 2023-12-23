@@ -24,6 +24,15 @@ void luna::Loc::update(int c)
     }
 }
 
+std::string str_linkage(luna::Linkage link){
+    switch(link){
+        case luna::Linkage::EXPORTED: return "Exported";
+        case luna::Linkage::IMPORTED: return "Imported";
+        case luna::Linkage::INTERNAL: return "Internal";
+    }
+    return "<Invalid Linkage Type>";
+}
+
 void luna::BlockStmt::print(){
     fmt::print("    |- Block statement\n");
     Ast new_ast;
@@ -96,8 +105,7 @@ void luna::Ast::print(){
                     std::get<std::shared_ptr<VarAssign>>(child)->get_value()._value);
             } break;
             case luna::AstType::VAR_DECLASSIGN: {
-                fmt::print("|- Var Decl: {}\n", std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name());
-                fmt::print("|- Var Assign: {} = {}\n", 
+                fmt::print("|- Var Decl Assign: {} = {}\n", 
                     std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name(), 
                     std::get<std::shared_ptr<VarDeclAssign>>(child)->get_value()._value);
             } break;
@@ -122,14 +130,6 @@ void luna::Ast::print(){
                 auto stmt = std::get<StmtTypes>(child);
                 StmtType stmtType = static_cast<StmtType>(stmt.index());
                 switch (stmtType) {
-                    case StmtType::IMPORT: {
-                        ImportStmt* is = std::get<ImportStmt*>(stmt);
-                        fmt::print("|- Import statement: {}\n", is->get_name());
-                        fmt::print("    |- Imported functions\n");
-                        for(std::string f : is->functions){
-                            fmt::print("        |- Function: {}\n", f);
-                        }
-                    } break;
                     case StmtType::BLOCK:
                     default: {
                         fmt::print("UNREACHABLE STATEMENT TYPE: {}\n", (int)stmtType);
@@ -139,6 +139,11 @@ void luna::Ast::print(){
             case luna::AstType::FUNC_DECL: {
                 auto decl = std::get<std::shared_ptr<FuncDecl>>(child).get();
                 fmt::print("|- Func Decl: {}\n", decl->get_name());
+                fmt::print("    |- Arguments\n");
+                for(std::string arg : decl->get_func_arguments()){
+                    fmt::print("        |- `{}`\n", arg);
+                }
+                fmt::print("    |- Linkage: {}\n", str_linkage(decl->get_linkage()));
                 BlockStmt body = decl->get_body();
                 body.print();
             } break;

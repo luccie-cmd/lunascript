@@ -6,7 +6,8 @@
 namespace luna{
     // A container for storing things used in all the Sema Funcitons
     struct SemaContext {
-        std::vector<std::string> declared_variables, declared_functions;
+        std::vector<std::pair<std::string, std::vector<std::string>>> declared_functions;
+        std::vector<std::string> declared_variables;
         std::string defined_function; // Function wherein we currently are
         bool build, is_body; // For enabeling the build system
     };

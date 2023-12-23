@@ -29,9 +29,41 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             switch (exprType) {
                 case ExprType::CALL: {
                     CallExpr *call = std::get<std::shared_ptr<CallExpr>>(expr).get();
-                    // TODO: Find a way to check for arity
-                    if(std::find(_sctx.declared_functions.begin(), _sctx.declared_functions.end(), call->get_name()) == _sctx.declared_functions.end()){
-                        _ctx.diag.Error("Cannot call to undeclared function `{}`\n", call->get_name());
+                    std::string call_name = call->get_name();
+                    std::vector<Token> call_arguments = call->get_operands();
+                    usz call_arity = call_arguments.size();
+                    bool found = false;
+                    std::pair<std::string, std::vector<std::string>> found_function;
+                    for(std::pair<std::string, std::vector<std::string>> func : _sctx.declared_functions){
+                        std::string func_name = func.first;
+                        std::vector<std::string> arity = func.second;
+                        if(func_name == call_name && call_arity == arity.size()){
+                            found = true;
+                            found_function = func;
+                            break;
+                        }
+                    }
+                    if(!found){
+                        _ctx.diag.Error("Cannot call to non existant function `{}` with argument number `{}`\n", call_name, call_arity);
+                    }
+                    for(usz i = 0; i < call_arity; ++i){
+                        Token call_arg = call_arguments.at(i);
+                        std::string func_arg = found_function.second.at(i);
+                        if(func_arg == "str"){
+                            if(call_arg._type != TokenType::STRING){
+                                _ctx.diag.Error("{}: Expected a string but got `{}`\n", call_arg.loc.to_str(), call_arg._value);
+                            }
+                        } else if(func_arg == "int"){
+                            if(call_arg._type != TokenType::NUMBER){
+                                _ctx.diag.Error("{}: Expected a number but got `{}`\n", call_arg.loc.to_str(), call_arg._value);
+                            }
+                        } else if(func_arg == "id"){
+                            if(call_arg._type != TokenType::ID){
+                                _ctx.diag.Error("{}: Expected an identifier but got `{}`\n", call_arg.loc.to_str(), call_arg._value);
+                            }
+                        } else{
+                            _ctx.diag.ICE("Unimplemented function argument type `{}`\n", func_arg);
+                        }
                     }
                 } break;
                 default: {
@@ -43,20 +75,6 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             auto stmt = std::get<StmtTypes>(child);
             StmtType stmtType = static_cast<StmtType>(stmt.index());
             switch (stmtType) {
-                case StmtType::IMPORT: {
-                    std::vector<std::string> imports = {
-                        "std",
-                    };
-                    if(std::find(imports.begin(), imports.end(), std::get<ImportStmt*>(stmt)->get_name()) == imports.end()){
-                        _ctx.diag.Note("Avaliable import types are: {}\n", imports.at(0));
-                        _ctx.diag.Error("Invalid import type: {}\n", std::get<ImportStmt*>(stmt)->get_name());
-                    }
-                    if(std::get<ImportStmt*>(stmt)->get_name() == "std"){
-                        _sctx.declared_functions.push_back("print");
-                        std::get<ImportStmt*>(stmt)->functions.push_back("print");
-                    }
-
-                } break;
                 case StmtType::BLOCK:
                 default: {
                     _ctx.diag.ICE("UNREACHABLE STATEMENT TYPE: {}\n", (int)stmtType);
@@ -67,10 +85,11 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             if(_sctx.is_body){
                 _ctx.diag.Error("Cannot define function `{}` inside of function `{}`!\n", std::get<std::shared_ptr<FuncDecl>>(child)->get_name(), _sctx.defined_function);
             }
-            if(std::find(_sctx.declared_functions.begin(), _sctx.declared_functions.end(), std::get<std::shared_ptr<FuncDecl>>(child)->get_name()) != _sctx.declared_functions.end()){
+            std::pair<std::string, std::vector<std::string>> func_decl = {std::get<std::shared_ptr<FuncDecl>>(child)->get_name(), std::get<std::shared_ptr<FuncDecl>>(child)->get_func_arguments()};
+            if(std::find(_sctx.declared_functions.begin(), _sctx.declared_functions.end(), func_decl) != _sctx.declared_functions.end()){
                 _ctx.diag.Error("Function `{}` is already defined!\n", std::get<std::shared_ptr<FuncDecl>>(child)->get_name());
             }
-            _sctx.declared_functions.push_back(std::get<std::shared_ptr<FuncDecl>>(child)->get_name());
+            _sctx.declared_functions.push_back(func_decl);
 
             SemaContext sctx_old = _sctx;
             analyse_blockStmt(std::get<std::shared_ptr<FuncDecl>>(child)->get_name(), std::get<std::shared_ptr<FuncDecl>>(child)->get_body());
@@ -89,6 +108,7 @@ void luna::Sema::analyse(){
     for (AstTypes child : _ast.get_children()) {
         if (auto assign = std::get_if<std::shared_ptr<VarAssign>>(&child)) {
             if (assign->get()->get_name() == "build") {
+                _ctx.diag.ICE("BUILD SYSTEM IS TEMPORARALY DISABLED AND NOT YET IMPLEMENTED\n");
                 _sctx.build = true;
             }
         }
@@ -116,10 +136,11 @@ void luna::Sema::setup_sema_build(){
     _sctx.declared_variables.push_back("destination_dir");
     _sctx.declared_variables.push_back("libs_path");
 
-    _sctx.declared_functions.push_back("build");
-    _sctx.declared_functions.push_back("set");
-    _sctx.declared_functions.push_back("message");
-    _sctx.declared_functions.push_back("add_git_repo");
-    _sctx.declared_functions.push_back("add_library");
-    _sctx.declared_functions.push_back("include_directory");
+    // _sctx.declared_functions.push_back("build");
+    // _sctx.declared_functions.push_back("set");
+    // _sctx.declared_functions.push_back("message");
+    // _sctx.declared_functions.push_back("add_git_repo");
+    // _sctx.declared_functions.push_back("add_library");
+    // _sctx.declared_functions.push_back("include_directory");
+
 }

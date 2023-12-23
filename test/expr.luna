@@ -1,6 +1,6 @@
 # Function calls
-import std # Use the std library for print
+import func puts(str); # This will add an imported function called puts
 
-func main(){
-    print("Hello, World!\n");
+export func main(){
+    puts("Hello, World!\n"); # Use puts
 }

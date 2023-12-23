@@ -1,7 +1,7 @@
 var x = 69420;
 var y;
 y = 420;
-func main(){
+export func main(){
     var z;
     z = 69;
 }

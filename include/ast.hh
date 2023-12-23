@@ -20,6 +20,12 @@ namespace luna
         STMT,
     };
 
+    enum Linkage {
+        IMPORTED,
+        EXPORTED,
+        INTERNAL,
+    };
+
     enum ExprType
     {
         CALL,
@@ -27,7 +33,6 @@ namespace luna
 
     enum StmtType
     {
-        IMPORT,
         BLOCK,
     };
 
@@ -40,12 +45,11 @@ namespace luna
     class VarDeclAssign; // For decleration and assignments in 1 (really just an VarAssign but now Sema knows too also define it)
     class VarAssign;
     class CallExpr;
-    class ImportStmt;
     class BlockStmt;
     class FuncDecl;
 
     using ExprTypes = std::variant<std::shared_ptr<CallExpr>>;
-    using StmtTypes = std::variant<ImportStmt*, std::shared_ptr<BlockStmt>>;
+    using StmtTypes = std::variant<std::shared_ptr<BlockStmt>>;
     using AstTypes = std::variant<std::shared_ptr<VarDecl>, std::shared_ptr<VarDeclAssign>, std::shared_ptr<VarAssign>, std::shared_ptr<FuncDecl>, ExprTypes, StmtTypes>;
 
     struct Scope{
@@ -157,31 +161,22 @@ namespace luna
         const std::vector<AstTypes>& get_body() const { return _body; }
     };
 
-    class ImportStmt : public Stmt{
-    private:
-        std::string name;
-    public:
-        std::vector<std::string> functions; // TODO: Import variables
-        ImportStmt(std::string _name){
-            _stmtType = StmtType::IMPORT;
-            name = _name;
-        }
-        void print();
-        std::string get_name() { return name; }
-    };
-
     class FuncDecl : public Shared_Ast
     {
     private:
         std::string _name;
+        std::vector<std::string> _func_arguments;
         BlockStmt _body;
+        Linkage linkage;
 
     public:
-        FuncDecl(std::string name, BlockStmt body) :_name(name), _body(body){
+        FuncDecl(std::string name, BlockStmt body, Linkage _linkage, std::vector<std::string> func_arguments) :_name(name), _body(body), linkage(_linkage), _func_arguments(func_arguments){
             _astType = AstType::FUNC_DECL;
         }
         const std::string& get_name() const { return _name; }
         const BlockStmt get_body() const { return _body; }
+        const std::vector<std::string> get_func_arguments() const { return _func_arguments; }
+        const Linkage get_linkage() const { return linkage; }
     };
 
     class VarDeclAssign : public Shared_Ast{
