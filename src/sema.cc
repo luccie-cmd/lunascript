@@ -1,5 +1,21 @@
 #include "sema.hh"
 
+std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign>> find_var_decl_by_name(luna::Context _ctx, std::vector<luna::AstTypes> ast, std::string name){
+    fmt::print("Name: {}\n", name);
+    for(luna::AstTypes child : ast){
+        if(child.index()+1 != luna::AstType::VAR_DECL && child.index()+1 != luna::AstType::VAR_DECLASSIGN)
+            continue;
+        
+        if(child.index()+1 == luna::AstType::VAR_DECL && std::get<std::shared_ptr<luna::VarDecl>>(child).get()->get_name() == name)
+            return std::get<std::shared_ptr<luna::VarDecl>>(child);
+        else if(child.index()+1 == luna::AstType::VAR_DECLASSIGN && std::get<std::shared_ptr<luna::VarDeclAssign>>(child).get()->get_name() == name)
+            return std::get<std::shared_ptr<luna::VarDeclAssign>>(child);
+        
+    }
+    _ctx.diag.Error("Found no variable declerations with name {}\n", name);
+    return std::make_shared<luna::VarDecl>(name);
+}
+
 void luna::Sema::analyse_astTypes(AstTypes child){
     AstType type = static_cast<AstType>(child.index()+1);
     switch(type){
@@ -13,6 +29,13 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             if(std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), std::get<std::shared_ptr<VarAssign>>(child)->get_name()) == _sctx.declared_variables.end()){
                 _ctx.diag.Error("Cannot assign to undeclared variable `{}`!\n", std::get<std::shared_ptr<VarAssign>>(child)->get_name());
             }
+            std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign>> decl = find_var_decl_by_name(_ctx, _sctx.current_func_body, std::get<std::shared_ptr<VarAssign>>(child)->get_name());
+            if(decl.index() != 0){
+                fmt::print("{}\n", decl.index());
+                _ctx.diag.ICE("bad std::variant index returned!\n");
+            }
+            auto var_decl = std::get<std::shared_ptr<luna::VarDecl>>(decl);
+            var_decl.get()->set_arg_type(std::get<std::shared_ptr<VarAssign>>(child)->get_value()._type == TokenType::NUMBER ? ArgType::I64 : ArgType::PTR);
         } break;
         case luna::AstType::VAR_DECLASSIGN: {
             if(std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name()) != _sctx.declared_variables.end()){
@@ -22,6 +45,14 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             if(std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name()) == _sctx.declared_variables.end()){
                 _ctx.diag.Error("Cannot assign to undeclared variable `{}`!\n", std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name());
             }
+
+            std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign>> decl = find_var_decl_by_name(_ctx, _sctx.current_func_body, std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name());
+            if(decl.index() != 1){
+                fmt::print("{}\n", decl.index());
+                _ctx.diag.ICE("bad std::variant index returned!\n");
+            }
+            auto var_decl = std::get<std::shared_ptr<luna::VarDeclAssign>>(decl);
+            var_decl.get()->set_arg_type(std::get<std::shared_ptr<VarDeclAssign>>(child)->get_value()._type == TokenType::NUMBER ? ArgType::I64 : ArgType::PTR);
         } break;
         case luna::AstType::EXPR: {
             auto expr = std::get<ExprTypes>(child);
@@ -132,6 +163,7 @@ void luna::Sema::analyse(){
     if(_sctx.build){
         setup_sema_build();
     }
+    _sctx.current_func_body = _ast.get_children();
     for(AstTypes child : _ast.get_children()){
         analyse_astTypes(child);
     }
@@ -139,6 +171,7 @@ void luna::Sema::analyse(){
 void luna::Sema::analyse_blockStmt(std::string name, BlockStmt stmt){
     _sctx.is_body = true;
     _sctx.defined_function = name;
+    _sctx.current_func_body = stmt.get_body();
     for(AstTypes child : stmt.get_body()){
         analyse_astTypes(child);
     }

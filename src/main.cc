@@ -5,6 +5,7 @@
 #include "diag.hh"
 #include "parser.hh"
 #include "sema.hh"
+#include "ir_gen.hh"
 
 using namespace command_line_options;
 
@@ -87,5 +88,7 @@ int main(int argc, char **argv)
         sema.analyse();
     }
     if(print_ast) ast.print();
+    IrGen irgen(ast);
+    Ir ir = irgen.get_ir();
     return 0;
 }

@@ -41,6 +41,7 @@ void luna::BlockStmt::print(){
         switch(type){
             case luna::AstType::VAR_DECL: {
                 fmt::print("        |- Var Decl: {}\n", std::get<std::shared_ptr<VarDecl>>(types)->get_name());
+                fmt::print("            |- Type: {}\n", std::get<std::shared_ptr<VarDecl>>(types)->get_arg_type() == ArgType::I64 ? "I64" : "ptr");
             } break;
             case luna::AstType::VAR_ASSIGN: {
                 fmt::print("        |- Var Assign: {} = {}\n", 
@@ -51,6 +52,7 @@ void luna::BlockStmt::print(){
                 fmt::print("        |- Var Decl Assign: {} = {}\n",
                     std::get<std::shared_ptr<VarDeclAssign>>(types)->get_name(), 
                     std::get<std::shared_ptr<VarDeclAssign>>(types)->get_value()._value);
+                fmt::print("            |- Type: {}\n", std::get<std::shared_ptr<VarDeclAssign>>(types)->get_arg_type() == ArgType::I64 ? "I64" : "ptr");
             } break;
             case luna::AstType::EXPR: {
                 auto expr = std::get<ExprTypes>(types);
@@ -102,6 +104,7 @@ void luna::Ast::print(){
                     continue;
                 }
                 fmt::print("|- Var Decl: {}\n", std::get<std::shared_ptr<VarDecl>>(child)->get_name());
+                fmt::print("    |- Type: {}\n", std::get<std::shared_ptr<VarDecl>>(child)->get_arg_type() == ArgType::I64 ? "I64" : "ptr");
             } break;
             case luna::AstType::VAR_ASSIGN: {
                 fmt::print("|- Var Assign: {} = {}\n", 
@@ -112,6 +115,7 @@ void luna::Ast::print(){
                 fmt::print("|- Var Decl Assign: {} = {}\n", 
                     std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name(), 
                     std::get<std::shared_ptr<VarDeclAssign>>(child)->get_value()._value);
+                    fmt::print("    |- Type: {}\n", std::get<std::shared_ptr<VarDeclAssign>>(child)->get_arg_type() == ArgType::I64 ? "I64" : "ptr");
             } break;
             case luna::AstType::EXPR: {
                 auto expr = std::get<ExprTypes>(child);

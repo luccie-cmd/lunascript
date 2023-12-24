@@ -37,6 +37,12 @@ namespace luna
         RETURN,
     };
 
+    enum ArgType{
+        I64,
+        PTR,
+    };
+
+
     struct Shared_Ast
     {
         AstType _astType;
@@ -82,6 +88,7 @@ namespace luna
     {
     private:
         std::string _name;
+        ArgType arg_type;
 
     public:
         VarDecl(std::string name) : _name(name)
@@ -89,6 +96,8 @@ namespace luna
             _astType = AstType::VAR_DECL;
         }
         const std::string& get_name() const { return _name; }
+        const ArgType& get_arg_type() const { return arg_type; }
+        void set_arg_type(ArgType type) { arg_type = type; }
     };
 
     class VarAssign : public Shared_Ast
@@ -194,6 +203,7 @@ namespace luna
     private:
         std::string _name;
         Token _value;
+        ArgType arg_type;
 
     public:
         VarDeclAssign(std::string name, Token value) : _name(name), _value(value)
@@ -202,6 +212,8 @@ namespace luna
         }
         const std::string& get_name() const { return _name; }
         const Token& get_value() const { return _value; }
+        const ArgType& get_arg_type() const { return arg_type; }
+        void set_arg_type(ArgType type) { arg_type = type; }
     };
 };
 
