@@ -44,6 +44,16 @@ namespace luna
             std::exit(1);
         }
     }
+    template<typename T>
+    // Appends the second one after the first one
+    // first-second
+    std::vector<T> copy_vector(std::vector<T> first, std::vector<T> second){
+        std::vector<T> ret = first;
+        for(T elem : second){
+            ret.push_back(elem);
+        }
+        return ret;
+    }
 
     // A location class for the tokens and AST nodes
     // Also this can't be a struct because of the functions

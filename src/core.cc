@@ -149,8 +149,8 @@ void luna::Ast::print(){
                 auto decl = std::get<std::shared_ptr<FuncDecl>>(child).get();
                 fmt::print("|- Func Decl: {}\n", decl->get_name());
                 fmt::print("    |- Arguments\n");
-                for(std::string arg : decl->get_func_arguments()){
-                    fmt::print("        |- `{}`\n", arg);
+                for(std::pair<std::string, std::string> arg : decl->get_func_arguments()){
+                    fmt::print("        |- {}: {}\n", arg.second, arg.first);
                 }
                 fmt::print("    |- Linkage: {}\n", str_linkage(decl->get_linkage()));
                 BlockStmt body = decl->get_body();

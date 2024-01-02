@@ -45,7 +45,7 @@ std::shared_ptr<luna::FuncDecl> luna::Parser::parse_func_decl(Linkage linkage){
         _ctx.diag.Error("{} Exptected open parentheses for function `{}` here\n", current.loc.to_str(), name);
     }
     current = _lexer.next_token();
-    std::vector<std::string> arguments;
+    std::vector<std::pair<std::string, std::string>> arguments;
     while(current._type != TokenType::CLOSE_PAREN){
         if(current._type != TokenType::ID){
             _ctx.diag.Error("Expected `id` before `{}`\n", current._value);
@@ -56,7 +56,14 @@ std::shared_ptr<luna::FuncDecl> luna::Parser::parse_func_decl(Linkage linkage){
                 _ctx.diag.Info("    {}\n", afat);
             _ctx.diag.Error("Expected a valid type but got `{}`\n", current._value);
         }
-        arguments.push_back(current._value);
+        std::pair<std::string, std::string> argument;
+        argument.first = current._value;
+        current = _lexer.next_token();
+        if(current._type != TokenType::ID){
+            _ctx.diag.Error("Expected argument name but got `{}`\n", current._value);
+        }
+        argument.second = current._value;
+        arguments.push_back(argument);
         current = _lexer.next_token();
         if(current._type == TokenType::CLOSE_PAREN){
             break;
@@ -157,7 +164,7 @@ luna::AstTypes luna::Parser::next_node(){
     // First off handle variable declerations
     if(current._value == VAR_DECL_NAME){
         std::variant<std::shared_ptr<VarDecl>, std::shared_ptr<VarDeclAssign>> decl = parse_var_decl();
-        switch(decl.index()+1){
+        switch(AstType(decl.index()+1)){
             case AstType::VAR_DECL: return std::get<std::shared_ptr<VarDecl>>(decl);
             case AstType::VAR_DECLASSIGN: return std::get<std::shared_ptr<VarDeclAssign>>(decl);
         }

@@ -169,7 +169,7 @@ namespace luna
         void add_body(AstTypes add) { _body.push_back(add); }
         void print();
         void populate_curent_scope();
-        const std::vector<AstTypes>& get_body() const { return _body; }
+        const std::vector<AstTypes> get_body() const { return _body; }
     };
 
     class ReturnStmt : public Stmt{
@@ -184,17 +184,17 @@ namespace luna
     {
     private:
         std::string _name;
-        std::vector<std::string> _func_arguments;
+        std::vector<std::pair<std::string, std::string>> _func_arguments;
         BlockStmt _body;
         Linkage linkage;
 
     public:
-        FuncDecl(std::string name, BlockStmt body, Linkage _linkage, std::vector<std::string> func_arguments) :_name(name), _body(body), linkage(_linkage), _func_arguments(func_arguments){
+        FuncDecl(std::string name, BlockStmt body, Linkage _linkage, std::vector<std::pair<std::string, std::string>> func_arguments) :_name(name), _body(body), linkage(_linkage), _func_arguments(func_arguments){
             _astType = AstType::FUNC_DECL;
         }
         const std::string& get_name() const { return _name; }
         const BlockStmt get_body() const { return _body; }
-        const std::vector<std::string> get_func_arguments() const { return _func_arguments; }
+        const std::vector<std::pair<std::string, std::string>> get_func_arguments() const { return _func_arguments; }
         const Linkage get_linkage() const { return linkage; }
         void set_linkage(Linkage link) { linkage = link; }
     };
