@@ -16,7 +16,7 @@ namespace luna{
         private:
             Ast _ast;
             Context _ctx;
-            void analyse_blockStmt(SemaContext sctx);
+            void analyse_blockStmt(SemaContext sctx, BlockStmt stmt);
             SemaContext analyse_astTypes(AstTypes type, SemaContext _sctx);
         public:
             Sema(Ast ast, Context ctx) :_ast(ast), _ctx(ctx){}

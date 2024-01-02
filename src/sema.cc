@@ -11,6 +11,7 @@ std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign
             return std::get<std::shared_ptr<luna::VarDeclAssign>>(child);
         
     }
+
     _ctx.diag.Error("Found no variable declerations with name {}\n", name);
     return std::make_shared<luna::VarDecl>(name);
 }
@@ -29,7 +30,12 @@ luna::SemaContext luna::Sema::analyse_astTypes(AstTypes child, SemaContext sctx)
             if(std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), std::get<std::shared_ptr<VarAssign>>(child)->get_name()) == _sctx.declared_variables.end()){
                 _ctx.diag.Error("Cannot assign to undeclared variable `{}`!\n", std::get<std::shared_ptr<VarAssign>>(child)->get_name());
             }
-            std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign>> decl = find_var_decl_by_name(_ctx, _sctx.current_func_body, std::get<std::shared_ptr<VarAssign>>(child)->get_name());
+            std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign>> decl;
+            if(std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), std::get<std::shared_ptr<VarAssign>>(child)->get_name()) != _sctx.declared_variables.end()){
+                decl = std::make_shared<VarDecl>(std::get<std::shared_ptr<VarAssign>>(child)->get_name());
+            } else{
+                decl = find_var_decl_by_name(_ctx, _sctx.current_func_body, std::get<std::shared_ptr<VarAssign>>(child)->get_name());
+            }
             if(decl.index() != 0){
                 fmt::print("{}\n", decl.index());
                 _ctx.diag.ICE("bad std::variant index returned!\n");
@@ -46,7 +52,13 @@ luna::SemaContext luna::Sema::analyse_astTypes(AstTypes child, SemaContext sctx)
                 _ctx.diag.Error("Cannot assign to undeclared variable `{}`!\n", std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name());
             }
 
-            std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign>> decl = find_var_decl_by_name(_ctx, _sctx.current_func_body, std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name());
+            std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign>> decl;
+
+            if (std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name()) != _sctx.declared_variables.end()) {
+                decl = std::make_shared<VarDeclAssign>(std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name(), std::get<std::shared_ptr<VarDeclAssign>>(child)->get_value());
+            } else {
+                decl = find_var_decl_by_name(_ctx, _sctx.current_func_body, std::get<std::shared_ptr<VarDeclAssign>>(child)->get_name());
+            }
             if(decl.index() != 1){
                 fmt::print("{}\n", decl.index());
                 _ctx.diag.ICE("bad std::variant index returned!\n");
@@ -155,13 +167,10 @@ luna::SemaContext luna::Sema::analyse_astTypes(AstTypes child, SemaContext sctx)
                 auto sharedvarDecl = std::make_shared<VarDecl>(varDecl);
                 new_sctx.current_func_body.push_back(sharedvarDecl);
             }
-            // Copy over the function body instructions
-            for(AstTypes inst : funcDecl.get_body().get_body()){
-                fmt::print("Copying function body index `{}`\n", inst.index()+1);
-                new_sctx.current_func_body.push_back(inst);
-            }
+            
             if(funcDecl.get_linkage() != Linkage::IMPORTED){
-                analyse_blockStmt(new_sctx);
+                BlockStmt body = funcDecl.get_body();
+                analyse_blockStmt(new_sctx, body);
             }
         } break;
 
@@ -181,8 +190,16 @@ void luna::Sema::analyse(){
         _sctx = analyse_astTypes(child, _sctx);
     }
 }
-void luna::Sema::analyse_blockStmt(SemaContext sctx){
-    for(AstTypes child : sctx.current_func_body){
-        sctx = analyse_astTypes(child, sctx);
+
+void luna::Sema::analyse_blockStmt(SemaContext sctx, BlockStmt blkStmt){
+    SemaContext copy_sctx = sctx;
+    
+    // Copy the body of the BlockStmt to the new context
+    std::vector<AstTypes> copied_body = copy_vector(sctx.current_func_body, blkStmt.get_body());
+
+    // Analyze the copied body
+    for(const AstTypes& child : copied_body){
+        fmt::print("Index {} (BlockStmt)\n", child.index()+1);
+        copy_sctx = analyse_astTypes(child, copy_sctx);
     }
 }
