@@ -169,7 +169,7 @@ namespace luna
         void add_body(AstTypes add) { _body.push_back(add); }
         void print();
         void populate_curent_scope();
-        const std::vector<AstTypes>& get_body() const { return _body; }
+        const std::vector<AstTypes> get_body() const { return _body; }
     };
 
     class ReturnStmt : public Stmt{

@@ -16,14 +16,11 @@ namespace luna{
         private:
             Ast _ast;
             Context _ctx;
-            SemaContext _sctx;
-            void analyse_blockStmt(std::string name, BlockStmt stmt);
-            void analyse_astTypes(AstTypes type);
-            void setup_sema_build();
+            void analyse_blockStmt(SemaContext sctx);
+            SemaContext analyse_astTypes(AstTypes type, SemaContext _sctx);
         public:
             Sema(Ast ast, Context ctx) :_ast(ast), _ctx(ctx){}
             void analyse();
-            bool is_build(){ return _sctx.build; }
     };
 };
 

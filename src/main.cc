@@ -88,7 +88,7 @@ int main(int argc, char **argv)
         sema.analyse();
     }
     if(print_ast) ast.print();
-    IrGen irgen(ast);
-    Ir ir = irgen.get_ir();
+    IrGen irgen(ctx, ast);
+    // Ir ir = irgen.get_ir();
     return 0;
 }

@@ -15,7 +15,8 @@ std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign
     return std::make_shared<luna::VarDecl>(name);
 }
 
-void luna::Sema::analyse_astTypes(AstTypes child){
+luna::SemaContext luna::Sema::analyse_astTypes(AstTypes child, SemaContext sctx){
+    SemaContext _sctx = sctx;
     AstType type = static_cast<AstType>(child.index()+1);
     switch(type){
         case luna::AstType::VAR_DECL: {
@@ -106,6 +107,7 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             switch (stmtType) {
                 case StmtType::RETURN: {
                     if(!_sctx.is_body){
+                        _ctx.diag.Info("Function that called the return `{}`\n", _sctx.defined_function);
                         _ctx.diag.Error("Cannot return in non function body!\n");
                     }
                     std::shared_ptr<ReturnStmt> ret_stmt = std::get<std::shared_ptr<ReturnStmt>>(stmt);
@@ -136,66 +138,51 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             }
             _sctx.declared_functions.push_back(func_decl);
 
-            auto& funcDecl = std::get<std::shared_ptr<FuncDecl>>(child);
-            for(std::pair<std::string, std::string> arg : funcDecl->get_func_arguments()){
-                if(std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), arg.second) != _sctx.declared_variables.end()){
-                    _ctx.diag.Error("Function argument `{}` is already defined or there has been a variable defined with the same name!\n", arg.second);
-                }
-                _sctx.declared_variables.push_back(arg.second);
-            }
+            FuncDecl funcDecl = *std::get<std::shared_ptr<FuncDecl>>(child).get();
 
-            SemaContext sctx_old = _sctx;
-            analyse_blockStmt(funcDecl->get_name(), funcDecl->get_body());
-            _sctx = sctx_old;
+            SemaContext new_sctx;
+            new_sctx.declared_variables = _sctx.declared_variables;
+            new_sctx.declared_functions = _sctx.declared_functions;
+            new_sctx.is_body = true;
+            new_sctx.defined_function = funcDecl.get_name();
+            // Copy over the function arguments as variable declerations
+            for(auto arg : funcDecl.get_func_arguments()){
+                if(std::find(new_sctx.declared_variables.begin(), new_sctx.declared_variables.end(), arg.second) != new_sctx.declared_variables.end()){
+                    _ctx.diag.Error("Variable `{}` is already defined or there is a variable with the same name!\n", arg.second);
+                }
+                VarDecl varDecl = *std::make_shared<VarDecl>(arg.second).get();
+                varDecl.set_arg_type(arg.first == "int" ? ArgType::I64 : ArgType::PTR);
+                auto sharedvarDecl = std::make_shared<VarDecl>(varDecl);
+                new_sctx.current_func_body.push_back(sharedvarDecl);
+            }
+            // Copy over the function body instructions
+            for(AstTypes inst : funcDecl.get_body().get_body()){
+                fmt::print("Copying function body index `{}`\n", inst.index()+1);
+                new_sctx.current_func_body.push_back(inst);
+            }
+            if(funcDecl.get_linkage() != Linkage::IMPORTED){
+                analyse_blockStmt(new_sctx);
+            }
         } break;
+
         case luna::AstType::ROOT:
         default: {
             _ctx.diag.ICE("UNREACHABLE AST TYPE: {}\n", (int)type);
         } break;
     }
+    return _sctx;
 }
 
 void luna::Sema::analyse(){
-    _sctx.build = false;
+    SemaContext _sctx;
     _sctx.is_body = false;
-    for (AstTypes child : _ast.get_children()) {
-        if (auto assign = std::get_if<std::shared_ptr<VarAssign>>(&child)) {
-            if (assign->get()->get_name() == "build") {
-                _ctx.diag.ICE("BUILD SYSTEM IS TEMPORARALY DISABLED AND NOT YET IMPLEMENTED\n");
-                _sctx.build = true;
-            }
-        }
-    }
-    if(_sctx.build){
-        setup_sema_build();
-    }
     _sctx.current_func_body = _ast.get_children();
     for(AstTypes child : _ast.get_children()){
-        analyse_astTypes(child);
+        _sctx = analyse_astTypes(child, _sctx);
     }
 }
-void luna::Sema::analyse_blockStmt(std::string name, BlockStmt stmt){
-    _sctx.is_body = true;
-    _sctx.defined_function = name;
-    _sctx.current_func_body = stmt.get_body();
-    for(AstTypes child : stmt.get_body()){
-        analyse_astTypes(child);
+void luna::Sema::analyse_blockStmt(SemaContext sctx){
+    for(AstTypes child : sctx.current_func_body){
+        sctx = analyse_astTypes(child, sctx);
     }
-    _sctx.is_body = false;
-}
-
-void luna::Sema::setup_sema_build(){
-    _sctx.declared_variables.push_back("build");
-    _sctx.declared_variables.push_back("project_name");
-    _sctx.declared_variables.push_back("project_version");
-    _sctx.declared_variables.push_back("destination_dir");
-    _sctx.declared_variables.push_back("libs_path");
-
-    // _sctx.declared_functions.push_back("build");
-    // _sctx.declared_functions.push_back("set");
-    // _sctx.declared_functions.push_back("message");
-    // _sctx.declared_functions.push_back("add_git_repo");
-    // _sctx.declared_functions.push_back("add_library");
-    // _sctx.declared_functions.push_back("include_directory");
-
 }

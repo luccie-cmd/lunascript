@@ -1,8 +1,9 @@
 var x = 69420;
 var y;
 y = 420;
-func main(){
+func main(int xy){
     var z;
     z = 69;
+    xy = 69;
     return 0;
 }
