@@ -9,7 +9,7 @@
 
 namespace luna
 {
-    enum AstType
+    enum struct AstType
     {
         ROOT,
         VAR_DECL,
@@ -20,24 +20,24 @@ namespace luna
         STMT,
     };
 
-    enum Linkage {
+    enum struct Linkage {
         IMPORTED,
         EXPORTED,
         INTERNAL,
     };
 
-    enum ExprType
+    enum struct ExprType
     {
         CALL,
     };
 
-    enum StmtType
+    enum struct StmtType
     {
         BLOCK,
         RETURN,
     };
 
-    enum ArgType{
+    enum struct ArgType{
         I64,
         PTR,
     };
