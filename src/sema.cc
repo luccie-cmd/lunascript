@@ -199,7 +199,6 @@ void luna::Sema::analyse_blockStmt(SemaContext sctx, BlockStmt blkStmt){
 
     // Analyze the copied body
     for(const AstTypes& child : copied_body){
-        fmt::print("Index {} (BlockStmt)\n", child.index()+1);
         copy_sctx = analyse_astTypes(child, copy_sctx);
     }
 }
