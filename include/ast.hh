@@ -9,7 +9,7 @@
 
 namespace luna
 {
-    enum AstType
+    enum struct AstType
     {
         ROOT,
         VAR_DECL,
@@ -26,18 +26,18 @@ namespace luna
         INTERNAL,
     };
 
-    enum ExprType
+    enum struct ExprType
     {
         CALL,
     };
 
-    enum StmtType
+    enum struct StmtType
     {
         BLOCK,
         RETURN,
     };
 
-    enum ArgType{
+    enum struct ArgType{
         I64,
         PTR,
     };
@@ -184,17 +184,17 @@ namespace luna
     {
     private:
         std::string _name;
-        std::vector<std::string> _func_arguments;
+        std::vector<std::pair<std::string, std::string>> _func_arguments;
         BlockStmt _body;
         Linkage linkage;
 
     public:
-        FuncDecl(std::string name, BlockStmt body, Linkage _linkage, std::vector<std::string> func_arguments) :_name(name), _body(body), linkage(_linkage), _func_arguments(func_arguments){
+        FuncDecl(std::string name, BlockStmt body, Linkage _linkage, std::vector<std::pair<std::string, std::string>> func_arguments) :_name(name), _body(body), linkage(_linkage), _func_arguments(func_arguments){
             _astType = AstType::FUNC_DECL;
         }
         const std::string& get_name() const { return _name; }
         const BlockStmt get_body() const { return _body; }
-        const std::vector<std::string> get_func_arguments() const { return _func_arguments; }
+        const std::vector<std::pair<std::string, std::string>> get_func_arguments() const { return _func_arguments; }
         const Linkage get_linkage() const { return linkage; }
         void set_linkage(Linkage link) { linkage = link; }
     };

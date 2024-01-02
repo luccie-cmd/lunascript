@@ -6,7 +6,7 @@
 namespace luna{
     // A container for storing things used in all the Sema Funcitons
     struct SemaContext {
-        std::vector<std::pair<std::string, std::vector<std::string>>> declared_functions;
+        std::vector<std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> declared_functions;
         std::vector<std::string> declared_variables;
         std::vector<AstTypes> current_func_body; // This is used by the Find_var_decl function
         std::string defined_function; // Function wherein we currently are

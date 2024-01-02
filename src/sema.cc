@@ -1,14 +1,13 @@
 #include "sema.hh"
 
 std::variant<std::shared_ptr<luna::VarDecl>, std::shared_ptr<luna::VarDeclAssign>> find_var_decl_by_name(luna::Context _ctx, std::vector<luna::AstTypes> ast, std::string name){
-    fmt::print("Name: {}\n", name);
     for(luna::AstTypes child : ast){
-        if(child.index()+1 != luna::AstType::VAR_DECL && child.index()+1 != luna::AstType::VAR_DECLASSIGN)
+        if(child.index()+1 != (int)luna::AstType::VAR_DECL && child.index()+1 != (int)luna::AstType::VAR_DECLASSIGN)
             continue;
         
-        if(child.index()+1 == luna::AstType::VAR_DECL && std::get<std::shared_ptr<luna::VarDecl>>(child).get()->get_name() == name)
+        if(child.index()+1 == (int)luna::AstType::VAR_DECL && std::get<std::shared_ptr<luna::VarDecl>>(child).get()->get_name() == name)
             return std::get<std::shared_ptr<luna::VarDecl>>(child);
-        else if(child.index()+1 == luna::AstType::VAR_DECLASSIGN && std::get<std::shared_ptr<luna::VarDeclAssign>>(child).get()->get_name() == name)
+        else if(child.index()+1 == (int)luna::AstType::VAR_DECLASSIGN && std::get<std::shared_ptr<luna::VarDeclAssign>>(child).get()->get_name() == name)
             return std::get<std::shared_ptr<luna::VarDeclAssign>>(child);
         
     }
@@ -64,11 +63,10 @@ void luna::Sema::analyse_astTypes(AstTypes child){
                     std::vector<Token> call_arguments = call->get_operands();
                     usz call_arity = call_arguments.size();
                     bool found = false;
-                    std::pair<std::string, std::vector<std::string>> found_function;
-                    for(std::pair<std::string, std::vector<std::string>> func : _sctx.declared_functions){
+                    std::pair<std::string, std::vector<std::pair<std::string, std::string>>> found_function;
+                    for(std::pair<std::string, std::vector<std::pair<std::string, std::string>>> func : _sctx.declared_functions){
                         std::string func_name = func.first;
-                        std::vector<std::string> arity = func.second;
-                        if(func_name == call_name && call_arity == arity.size()){
+                        if(func_name == call_name && call_arity == func.second.size()){
                             found = true;
                             found_function = func;
                             break;
@@ -79,7 +77,7 @@ void luna::Sema::analyse_astTypes(AstTypes child){
                     }
                     for(usz i = 0; i < call_arity; ++i){
                         Token call_arg = call_arguments.at(i);
-                        std::string func_arg = found_function.second.at(i);
+                        std::string func_arg = found_function.second.at(i).first;
                         if(func_arg == "str"){
                             if(call_arg._type != TokenType::STRING){
                                 _ctx.diag.Error("{}: Expected a string but got `{}`\n", call_arg.loc.to_str(), call_arg._value);
@@ -129,7 +127,7 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             if(_sctx.is_body){
                 _ctx.diag.Error("Cannot define function `{}` inside of function `{}`!\n", std::get<std::shared_ptr<FuncDecl>>(child)->get_name(), _sctx.defined_function);
             }
-            std::pair<std::string, std::vector<std::string>> func_decl = {std::get<std::shared_ptr<FuncDecl>>(child)->get_name(), std::get<std::shared_ptr<FuncDecl>>(child)->get_func_arguments()};
+            std::pair<std::string, std::vector<std::pair<std::string, std::string>>> func_decl = {std::get<std::shared_ptr<FuncDecl>>(child)->get_name(), std::get<std::shared_ptr<FuncDecl>>(child)->get_func_arguments()};
             if(std::find(_sctx.declared_functions.begin(), _sctx.declared_functions.end(), func_decl) != _sctx.declared_functions.end()){
                 _ctx.diag.Error("Function `{}` is already defined!\n", std::get<std::shared_ptr<FuncDecl>>(child)->get_name());
             }
@@ -138,8 +136,16 @@ void luna::Sema::analyse_astTypes(AstTypes child){
             }
             _sctx.declared_functions.push_back(func_decl);
 
+            auto& funcDecl = std::get<std::shared_ptr<FuncDecl>>(child);
+            for(std::pair<std::string, std::string> arg : funcDecl->get_func_arguments()){
+                if(std::find(_sctx.declared_variables.begin(), _sctx.declared_variables.end(), arg.second) != _sctx.declared_variables.end()){
+                    _ctx.diag.Error("Function argument `{}` is already defined or there has been a variable defined with the same name!\n", arg.second);
+                }
+                _sctx.declared_variables.push_back(arg.second);
+            }
+
             SemaContext sctx_old = _sctx;
-            analyse_blockStmt(std::get<std::shared_ptr<FuncDecl>>(child)->get_name(), std::get<std::shared_ptr<FuncDecl>>(child)->get_body());
+            analyse_blockStmt(funcDecl->get_name(), funcDecl->get_body());
             _sctx = sctx_old;
         } break;
         case luna::AstType::ROOT:
