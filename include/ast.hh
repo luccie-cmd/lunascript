@@ -49,7 +49,7 @@ namespace luna
     };
 
     class VarDecl;
-    class VarDeclAssign; // For decleration and assignments in 1 (really just an VarAssign but now Sema knows too also define it)
+    class VarDeclAssign; // For decleration and assignments in 1 (really just an VarAssign but now Sema knows to also define it)
     class VarAssign;
     class CallExpr;
     class BlockStmt;
